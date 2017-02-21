@@ -52,6 +52,7 @@ router.post('/user/login', function(req, res) {
         }else{
             if(pass == docs.password){
               access_token.push(docs._id);
+                access_token=docs._id;
               res.json("Access_token"+":"+ docs._id);
             }else{
               res.json("Invalid Password");
@@ -69,6 +70,8 @@ router.get('/user/get/:id', function(req, res) {
     }
     if(i>=0&&i<access_token.length){
         req.users.findOne({
+    if(mongo_id == access_token){
+        req.userfetch.findOne({
            "_id": mongo_id,
         },function(err, docs) {
         if (err) {
@@ -81,6 +84,5 @@ router.get('/user/get/:id', function(req, res) {
     res.json("Invalid token");
 }
 });
-
 
 module.exports = router;
