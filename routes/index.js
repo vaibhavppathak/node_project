@@ -98,5 +98,32 @@ router.get('/user/delete/:id', function(req, res) {
   })
 });
 
+<!----- fetching data by page number  ---->
 
+router.get('/user/list/:page', function(req, res) {
+  var number=req.params.page;
+  var data=[]
+  var lowerlimit=(number-1)*10;
+  var upperlimit=(number)*10;
+  console.log(number);
+  req.users.find({}, function(err, result) {
+        if (err) {
+            res.json({
+                status: 0,
+                message: 'user data is not found'
+            });
+        } else {
+            if(!(upperlimit>result.length)){
+              for(var i=lowerlimit;i<upperlimit;i++){
+                  data.push(result[i]);
+              }
+            }else{
+                for(var i=lowerlimit;i<result.length;i++){
+                  data.push(result[i]);
+                }
+              }
+              res.json(data)
+        }
+    });
+})
 module.exports = router;
