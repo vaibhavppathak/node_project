@@ -3,7 +3,7 @@ var mongoose = require('mongoose');
 var router = express.Router();  //creatig insatnce of express function
 var uniqueValidator = require('mongoose-unique-validator');
 var crypto =require('crypto');
-var access_token="";
+var access_token=[];
 
 router.post('/user/register', function(req, res) {  
     var username = req.body.user_name;
@@ -16,7 +16,7 @@ router.post('/user/register', function(req, res) {
     var cpass=crypto.createHash('md5').update(cpassword).digest('hex');
     if((username.length >0) && (password.length >0) && (cpassword.length >0) && (email.length >0)&&(firstname.length >0)&&(lastname.length >0)){
         if(pass == cpass) {
-            var record = new req.Collection_user({
+            var record = new req.users({
                "username": username,
                "password": pass,
                "email": email,
@@ -44,13 +44,14 @@ router.post('/user/login', function(req, res) {
     var username = req.body.user_name;
     var password = req.body.password;
     var pass=crypto.createHash('md5').update(password).digest('hex');
-    req.userfetch.findOne({
+    req.users.findOne({
         "username":username,
     }, function(err, docs) {
         if (err) {
             res.json("Your username is not exist");
         }else{
             if(pass == docs.password){
+              access_token.push(docs._id);
                 access_token=docs._id;
               res.json("Access_token"+":"+ docs._id);
             }else{
@@ -62,6 +63,13 @@ router.post('/user/login', function(req, res) {
 
 router.get('/user/get/:id', function(req, res) {
     var mongo_id = req.params.id;
+    for(var i=0;i<access_token.length;i++){
+      if(access_token[i]==mongo_id){
+        break;
+      }
+    }
+    if(i>=0&&i<access_token.length){
+        req.users.findOne({
     if(mongo_id == access_token){
         req.userfetch.findOne({
            "_id": mongo_id,
