@@ -3,7 +3,10 @@ var mongoose = require('mongoose');
 var router = express.Router();  //creatig insatnce of express function
 var uniqueValidator = require('mongoose-unique-validator');
 var crypto =require('crypto');
-var access_token=[];
+var http = require('http');
+var app=express();
+var validate=require("./validate.js")
+
 
 router.post('/user/register', function(req, res) {  
     var username = req.body.user_name;
@@ -38,7 +41,7 @@ router.post('/user/register', function(req, res) {
     }        
 });
 
-<!--------- fetch data from mongodb through url -------->
+<!--------- login -------->
 
 router.post('/user/login', function(req, res) {  
     var username = req.body.user_name;
@@ -51,36 +54,48 @@ router.post('/user/login', function(req, res) {
             res.json("Your username is not exist");
         }else{
             if(pass == docs.password){
-              access_token.push(docs._id);
               res.json("Access_token"+":"+ docs._id);
             }else{
-              res.json("Invalid Password");
+              res.status(500).send({ error: "invalid password" });
             }
-        }   
+        }  
     });
-});
 
+});
+<!--------- fetch data from mongodb through url -------->
 router.get('/user/get/:id', function(req, res) {
-    var mongo_id = req.params.id;
-    for(var i=0;i<access_token.length;i++){
-      if(access_token[i]==mongo_id){
-        break;
-      }
-    }
-    if(i>=0&&i<access_token.length){
-        req.users.findOne({
-           "_id": mongo_id,
-        },function(err, docs) {
-        if (err) {
-          res.json("Invalid token");
-        }else {
-          res.json(docs);
-        }
-    });
-}else{
-    res.json("Invalid token");
-}
+    var id=req.params.id;
+    validate(id,req.users,function(err,resp){
+      if(err=="error"){
+        res.json({status:0,message:"invalid token"})
+      }else
+      res.json(resp);
 });
+  })
 
+<!----------- delete data from mongodb through url -------->
 
+router.get('/user/delete/:id', function(req, res) {
+    var id=req.params.id;
+    validate(id,req.users,function(err,resp){
+    if(!(err=="error")){
+    req.users.remove({
+        _id: id
+    }, function(err, result) {
+        if (err) {
+            res.json(err);
+        } else {
+            var parsed = JSON.parse(result); // parsing json result...
+            if (parsed.n == 1) {
+                res.json("data removed")
+            } else {
+                res.json("data not found");
+            }
+          }
+    });
+    }else{
+      res.json({status:0,message:"invalid token"})
+    }
+  })
+});
 module.exports = router;
