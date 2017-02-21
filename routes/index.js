@@ -60,7 +60,6 @@ router.post('/user/login', function(req, res) {
             }
         }  
     });
-
 });
 <!--------- fetch data from mongodb through url -------->
 router.get('/user/get/:id', function(req, res) {
@@ -98,4 +97,6 @@ router.get('/user/delete/:id', function(req, res) {
     }
   })
 });
+
+
 module.exports = router;
