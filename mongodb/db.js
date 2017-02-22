@@ -27,7 +27,7 @@ module.exports = function() {
     // Apply the uniqueValidator plugin to userSchema. 
     usercreate.plugin(uniqueValidator, { message: 'Error, username && email should be unique.' });
     userfetch.plugin(uniqueValidator);
-    var usercreate = conn.model('create', usercreate);
+    var users = conn.model('create', usercreate);
     var userfetch = conn.model('fetch', userfetch);
 
     return function(req, res, next) {

@@ -60,21 +60,14 @@ router.post('/user/login', function(req, res) {
     });
 });
 
-router.get('/user/get/:id', function(req, res) {
-    var mongo_id = req.params.id;
-    if(mongo_id == access_token){
-        req.userfetch.findOne({
-           "_id": mongo_id,
-        },function(err, docs) {
-        if (err) {
-          res.json("Invalid token");
-        }else {
-          res.json(docs);
-        }
-    });
-}else{
-    res.json("Invalid token");
-}
-});
+router.get('/user/get/:access_token', function(req, res) {
+  var access_token=req.params.access_token;
+  validate(access_token,req.users,function(err,userdetail){
+    if(err=="error"){
+      res.json({status:0,message:"invalid token"})
+    }else
+    res.json(userdetail);
+  });
+})
 
 module.exports = router;
