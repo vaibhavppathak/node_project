@@ -2,9 +2,7 @@ var express = require('express');
 var app=express()
 var mongoose = require('mongoose');
 var router = express.Router();  //creatig insatnce of express function
-var uniqueValidator = require('mongoose-unique-validator');
 var crypto =require('crypto');
-// var validate=require('./validate.js');
 
 router.post('/user/register', function(req, res) {  
     var username = req.body.user_name;
@@ -17,7 +15,7 @@ router.post('/user/register', function(req, res) {
     var cpass=crypto.createHash('md5').update(cpassword).digest('hex');
     if((username.length >0) && (password.length >0) && (cpassword.length >0) && (email.length >0)&&(firstname.length >0)&&(lastname.length >0)){
         if(pass == cpass) {
-            var record = new req.Collection_user({
+            var record = new req.users({
                "username": username,
                "password": pass,
                "email": email,
@@ -40,7 +38,6 @@ router.post('/user/register', function(req, res) {
 });
 
 <!--------- fetch data from mongodb through url -------->
-
 router.post('/user/login', function(req, res) {  
     var username = req.body.user_name;
     var password = req.body.password;
@@ -69,6 +66,20 @@ router.get('/user/get/:access_token', function(req, res) {
       res.json({status:0,userdata:resp});
     }
   });
+
+<!----- Delete data from mongodb through url  ----->
+router.get('/user/delete/:id', function(req, res) {
+  var access_token = req.params.id;
+    req.users.findOne({"_id": access_token},function (err, data) {             
+      if(err){
+          res.json("Invalid token");
+        }else if(data != null){     
+            data.remove() 
+            res.json("Data removed from mongodb"); 
+        }else{
+           res.json("Invalid token"); 
+        }
+    });
 });
 function validate(token,req,callback) {
   req.users.findOne({
@@ -82,4 +93,18 @@ function validate(token,req,callback) {
   });
 }
 
+<!----------- Pagination --------->
+router.get('/user/list/:page', function(req, res) {
+  var page=req.params.page;
+  var per_page=10;
+  req.users.find().skip((page-1)*per_page).limit(per_page).exec(function(err, data) {
+        if (err) {
+          return res.status(400).send({
+              message: err
+          });
+        }else {
+          res.json({data: data});
+        }
+    });
+}); 
 module.exports = router;
