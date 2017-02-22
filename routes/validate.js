@@ -5,7 +5,7 @@ module.exports = function (mongoid,users,callback) {
 		if (err) {
 			callback('error',err);
 		}else {
-			callback("result",docs)
+			callback("result",docs);
 		}
 	});
 }

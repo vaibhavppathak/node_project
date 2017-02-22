@@ -1,9 +1,10 @@
 var express = require('express');
+var app=express()
 var mongoose = require('mongoose');
 var router = express.Router();  //creatig insatnce of express function
 var uniqueValidator = require('mongoose-unique-validator');
 var crypto =require('crypto');
-var access_token="";
+// var validate=require('./validate.js');
 
 router.post('/user/register', function(req, res) {  
     var username = req.body.user_name;
@@ -44,14 +45,13 @@ router.post('/user/login', function(req, res) {
     var username = req.body.user_name;
     var password = req.body.password;
     var pass=crypto.createHash('md5').update(password).digest('hex');
-    req.userfetch.findOne({
+    req.users.findOne({
         "username":username,
     }, function(err, docs) {
         if (err) {
             res.json("Your username is not exist");
         }else{
             if(pass == docs.password){
-                access_token=docs._id;
               res.json("Access_token"+":"+ docs._id);
             }else{
               res.json("Invalid Password");
@@ -61,13 +61,25 @@ router.post('/user/login', function(req, res) {
 });
 
 router.get('/user/get/:access_token', function(req, res) {
-  var access_token=req.params.access_token;
-  validate(access_token,req.users,function(err,userdetail){
+  var access_token= req.params.access_token;
+  validate(access_token,req,function(err,resp){
     if(err=="error"){
       res.json({status:0,message:"invalid token"})
-    }else
-    res.json(userdetail);
+    }else{
+      res.json({status:0,userdata:resp});
+    }
   });
-})
+});
+function validate(token,req,callback) {
+  req.users.findOne({
+    "_id": token,
+  },function(err, docs) {
+    if (err) {
+      callback('error',err);
+    }else {
+      callback("result",docs);
+    }
+  });
+}
 
 module.exports = router;
