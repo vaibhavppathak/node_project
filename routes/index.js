@@ -11,9 +11,8 @@ router.post('/user/register', function(req, res) {
     var firstname = req.body.first_name;
     var lastname = req.body.last_name; 
     var pass=crypto.createHash('md5').update(password).digest('hex');
-    var cpass=crypto.createHash('md5').update(cpassword).digest('hex');
     if((username.length >0) && (password.length >0) && (cpassword.length >0) && (email.length >0)&&(firstname.length >0)&&(lastname.length >0)){
-        if(pass == cpass) {
+        if(password == cpassword) {
             var record = new req.users({
                "username": username,
                "password": pass,
@@ -29,7 +28,7 @@ router.post('/user/register', function(req, res) {
                 }
             });
         }else{
-         res.json("Password not matched")
+         res.json("Password is not matched")
         } 
     }else{
         res.json("All field must be filled out");
@@ -46,19 +45,16 @@ router.post('/user/login', function(req, res) {
     }, function(err, docs) {
         if (err) {
             res.json("Your username is not exist");
+        }else if(pass == docs.password){
+          var access_token=docs._id;
+            res.json({'access_token':docs._id});  
         }else{
-            if(pass == docs.password){
-              var access_token = {'Access_token':docs._id}
-              res.json(access_token);  
-            }else{
-              res.json("Invalid Password");
-            }
-        }   
+            res.status(500).send({status:0,message:"Invalid password"});
+        }  
     });
 });
-
-router.get('/user/get/:id', function(req, res) {
-  var access_token = req.params.id;
+router.get('/user/get/:access_token', function(req, res) {
+  var access_token = req.params.access_token;
   req.users.findOne({
    "_id": access_token,
   },function(err, data){
@@ -71,7 +67,7 @@ router.get('/user/get/:id', function(req, res) {
 });
 
 <!----- Delete data from mongodb through url  ----->
-router.get('/user/delete/:id', function(req, res) {
+router.get('/user/delete/:access_token', function(req, res) {
   var access_token = req.params.id;
     req.users.findOne({"_id": access_token},function (err, data) {             
       if(err){
@@ -92,7 +88,7 @@ router.get('/user/list/:page', function(req, res) {
   req.users.find().skip((page-1)*per_page).limit(per_page).exec(function(err, data) {
         if (err) {
           return res.status(400).send({
-              message: err
+            message: err
           });
         }else {
           res.json({data: data});
