@@ -82,5 +82,4 @@ router.get('/user/list/:page', function(req, res) {
         }
     });
 }); 
-
 module.exports = router;
