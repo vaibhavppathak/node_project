@@ -27,7 +27,7 @@ module.exports = function() {
     var userlogin  = conn.model('login', loginSchema);
     return function(req, res, next) {
         req.users = usercreate;
-        req.login = userlogin;
+        req.access_token = userlogin;
         next();
     }
 }

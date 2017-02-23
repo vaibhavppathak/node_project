@@ -4,6 +4,8 @@ var mongoose = require('mongoose');
 var router = express.Router();  //creatig insatnce of express function
 var crypto =require('crypto');
 var moment=require("moment");
+<!---- user Registration ------>
+
 router.post('/user/register', function(req, res,next) {  
     var username = req.body.user_name;
     var password = req.body.password;
@@ -37,6 +39,7 @@ router.post('/user/register', function(req, res,next) {
 });
 
 <!--------- login -------->
+
 router.post('/user/login', function(req, res,next) {  
     var username = req.body.user_name;
     var password = req.body.password;
@@ -47,8 +50,8 @@ router.post('/user/login', function(req, res,next) {
         if (err) {
             res.json("Your username is not exist");
         }else if(pass == docs.password){
-          var now=moment().format("YYYY-MM-DD'T'HH:mm:ss:SSSZ");
-            var loginRecord = new req.login({
+          var now=moment().format("YYYY-MM-DD'T'HH:mm:ss:SSSZ"); // save date in proper format....
+            var loginRecord = new req.access_token({
                 "userid": docs._id,
                 "token" : now
                });
@@ -67,6 +70,7 @@ router.post('/user/login', function(req, res,next) {
 });
 
 <!--------- fetch data from mongodb through url -------->
+
 router.get('/user/get/:access_token', function(req, res) {
   var access_token = req.params.access_token;
   console.log(req.token)

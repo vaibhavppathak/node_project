@@ -3,7 +3,7 @@ module.exports = function(req, res, next) {
 	var username = req.body.user_name;
 	if(username==null){
 	var token = req.url.split("/");
-		req.login.findOne({
+		req.access_token.findOne({
 			token: token[3]
 		},function(err, res1) {
 			if (err) {
