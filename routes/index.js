@@ -3,8 +3,8 @@ var app=express()
 var mongoose = require('mongoose');
 var router = express.Router();  //creatig insatnce of express function
 var crypto =require('crypto');
-
-router.post('/user/register', function(req, res) {  
+var moment=require("moment");
+router.post('/user/register', function(req, res,next) {  
     var username = req.body.user_name;
     var password = req.body.password;
     var cpassword = req.body.confirm_password;
@@ -23,21 +23,21 @@ router.post('/user/register', function(req, res) {
             });
             record.save(function(err,details) {
                 if (err) {
-                   res.json("Username or Email already exists");
+                   next("user already exist");
                 } else {
-                   res.json("Record inserted successfully");
+                   next("Record inserted successfully");
                 }
             });
         }else{
-         res.json("Password is not matched")
+         next("Password is not matched")
         } 
     }else{
-        res.json("All field must be filled out");
+        next("All field must be filled out");
     }        
 });
 
 <!--------- login -------->
-router.post('/user/login', function(req, res) {  
+router.post('/user/login', function(req, res,next) {  
     var username = req.body.user_name;
     var password = req.body.password;
     var pass=crypto.createHash('md5').update(password).digest('hex');
@@ -47,8 +47,19 @@ router.post('/user/login', function(req, res) {
         if (err) {
             res.json("Your username is not exist");
         }else if(pass == docs.password){
-          var access_token=docs._id;
-            res.json({'access_token':docs._id});  
+          var now=moment().format("YYYY-MM-DD'T'HH:mm:ss:SSSZ");
+            var loginRecord = new req.login({
+                "userid": docs._id,
+                "token" : now
+               });
+            loginRecord.save(function(err,details) {
+                if (err) {
+                   next("invalid login");
+                } else {
+                   res.json({status:1,message:"data saved"})
+                }
+            });
+              
         }else{
             res.status(500).send({status:0,message:"Invalid password"});
         }  
@@ -58,8 +69,9 @@ router.post('/user/login', function(req, res) {
 <!--------- fetch data from mongodb through url -------->
 router.get('/user/get/:access_token', function(req, res) {
   var access_token = req.params.access_token;
+  console.log(req.token)
   req.users.findOne({
-   "_id": access_token,
+   "_id": req.token,
   },function(err, data){
     if (err) {
       res.json("Invalid token");
@@ -67,5 +79,5 @@ router.get('/user/get/:access_token', function(req, res) {
       res.json(data);
     }
   });
-
+});
 module.exports = router;
