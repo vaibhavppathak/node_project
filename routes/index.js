@@ -11,9 +11,8 @@ router.post('/user/register', function(req, res) {
     var firstname = req.body.first_name;
     var lastname = req.body.last_name; 
     var pass=crypto.createHash('md5').update(password).digest('hex');
-    var cpass=crypto.createHash('md5').update(cpassword).digest('hex');
     if((username.length >0) && (password.length >0) && (cpassword.length >0) && (email.length >0)&&(firstname.length >0)&&(lastname.length >0)){
-        if(pass == cpass) {
+        if(password == cpassword) {
             var record = new req.users({
                "username": username,
                "password": pass,
@@ -29,7 +28,7 @@ router.post('/user/register', function(req, res) {
                 }
             });
         }else{
-         res.json("Password not matched")
+         res.json("Password is not matched")
         } 
     }else{
         res.json("All field must be filled out");
@@ -54,7 +53,6 @@ router.post('/user/login', function(req, res) {
         }  
     });
 });
-
 router.get('/user/get/:access_token', function(req, res) {
   var access_token = req.params.access_token;
   req.users.findOne({
@@ -70,34 +68,18 @@ router.get('/user/get/:access_token', function(req, res) {
 
 <!----- Delete data from mongodb through url  ----->
 router.get('/user/delete/:access_token', function(req, res) {
-  var access_token= req.params.access_token;
-  validate(access_token,req,function(err,result){
-    if(err=="error"){
-     res.json({status:0,message:"invalid token"})
-    }else{
-      req.users.findOne({"_id": access_token},function (err, data) {             
-        if(err){
-          res.json("User not found");
-        }else{     
-          data.remove() 
-          res.json("Data removed from mongodb"); 
+  var access_token = req.params.id;
+    req.users.findOne({"_id": access_token},function (err, data) {             
+      if(err){
+          res.json("Invalid token");
+        }else if(data != null){     
+            data.remove() 
+            res.json("Data removed from mongodb"); 
+        }else{
+           res.json("Invalid token"); 
         }
-      });
-    }
-  });
-  function validate(access_token,req,callback) {
-    req.users.findOne({
-     "_id": access_token,
-    },function(err, docs) {
-      if (err) {
-       callback('error',err);
-      }else {
-       callback("result",docs);
-      }
     });
-  }
-}); 
-
+});
 
 <!----------- Pagination --------->
 router.get('/user/list/:page', function(req, res) {
