@@ -9,9 +9,9 @@ module.exports = function(req, res, next) {
           _id: access_token[3]
         },function(err, result) {
         if (err) {
-            res.json('you are not authenticated');
+           res.json('you are not authenticated');
         }else {
-            next();
+          next();
         }
         })
     }else{
