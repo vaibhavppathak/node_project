@@ -73,7 +73,6 @@ router.post('/user/login', function(req, res, next) {
 
 router.get('/user/get/:access_token', function(req, res) {
     var access_token = req.params.access_token;
-    console.log(req.token)
     req.users.findOne({
         "_id": req.token,
     }, function(err, data) {
