@@ -1,9 +1,10 @@
-var path = require("path")
+var path = require("path");
 module.exports = function(req, res, next) {
     var token = req.url.split("/");
-    if (token[2] == "get") {
+    console.log(token[3])
+    if (req.method != "POST") {
         req.access_token.findOne({
-            token: token[3]
+            userid: token[3]
         }, function(err, res1) {
             if (err) {
                 res.json('you are not authenticated');
