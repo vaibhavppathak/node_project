@@ -11,11 +11,10 @@ module.exports = function(req, res, next) {
             } else if (!result) {
                 res.json('you are not authenticated');
             } else {
-                var startDate = moment(result.token, "YYYY-MM-DD'T'HH:mm:ss:SSSZ");
-                var endDate = moment();
-                var difference = endDate.diff(startDate);
-                console.log(difference);
-                if (difference < 60 * 60 * 1000) {
+                var startDate = parseInt(result.expiry);
+                var endDate = moment().unix();
+                var difference = startDate - endDate;
+                if (difference >= 0) {
                     req.token = result.userid;
                     next();
                 } else {

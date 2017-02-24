@@ -50,10 +50,16 @@ router.post('/user/login', function(req, res, next) {
         if (err) {
             res.json("Your username is not exist");
         } else if (pass == docs.password) {
-            var now = moment().format("YYYY-MM-DD'T'HH:mm:ss:SSSZ"); // save date in proper format....
+            var now = moment().unix().toString(); // save date in proper format....
+            console.log(now);
+            var token = crypto.createHash('md5').update(now).digest('hex');
+            console.log(token);
+            var expiry = moment().unix() + 60 * 60;
+            console.log(expiry)
             var loginRecord = new req.access_token({
                 "userid": docs._id,
-                "token": now
+                "token": token,
+                "expiry": expiry
             });
             loginRecord.save(function(err, details) {
                 if (err) {

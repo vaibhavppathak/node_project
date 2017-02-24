@@ -18,6 +18,7 @@ module.exports = function() {
     var loginSchema = mongoose.Schema({
         userid: { type: String, required: true, index: { unique: true } },
         token: { type: String, required: true },
+        expiry: { type: String, required: true }
     }, {
         strict: true,
         collection: 'login'
