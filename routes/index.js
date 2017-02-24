@@ -4,7 +4,7 @@ var mongoose = require('mongoose');
 var router = express.Router();  //creatig insatnce of express function
 var crypto =require('crypto');
 
-<!--- insert data into mongodb ---->
+<!---- insert data into mongodb ---->
 router.post('/user/register', function(req, res) {  
     var username = req.body.user_name;
     var password = req.body.password;
@@ -33,11 +33,11 @@ router.post('/user/register', function(req, res) {
          res.json("Password is not matched")
         } 
     }else{
-        res.json("All field must be filled out");
+      res.json("All field must be filled out");
     }        
 });
 
-<!--------- login -------->
+<!---- login -------->
 router.post('/user/login', function(req, res) {  
     var username = req.body.user_name;
     var password = req.body.password;
@@ -56,7 +56,7 @@ router.post('/user/login', function(req, res) {
     });
 });
 
-<!--------- fetch data from mongodb through url -------->
+<!---- fetch data from mongodb through url -------->
 router.get('/user/get/:access_token', function(req, res) {
   var access_token = req.params.access_token;
   req.users.findOne({
@@ -69,12 +69,12 @@ router.get('/user/get/:access_token', function(req, res) {
     }
   });
   
-<!----- Delete data from mongodb through url  ----->
-router.all('/user/delete/:access_token', function(req, res) {
+<!---- Delete data from mongodb through url  ----->
+router.get('/user/delete/:access_token', function(req, res) {
     var access_token= req.params.access_token;
     req.users.findOne({"_id": access_token},function (err, data) {             
       if(err){
-          throw err;
+          res.json("Invalid token");
         }else if(data != null){     
             data.remove() 
             res.json("Data removed from mongodb"); 

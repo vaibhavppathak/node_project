@@ -14,7 +14,6 @@ module.exports = function() {
         strict: true,
         collection: 'users'
     });
-
     var usercreate = conn.model('create', usercreate);
     return function(req, res, next) {
         req.users = usercreate;

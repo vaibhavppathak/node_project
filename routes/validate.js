@@ -1,4 +1,5 @@
 var moment = require('moment');
+// the middleware function
 module.exports = function(req, res, next) {
     var access_token = req.url.split("/");
     var startDate=moment(access_token[3],"YYYY-MM-DD'T'HH:mm:ss:SSSZ");
