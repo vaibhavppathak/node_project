@@ -57,13 +57,13 @@ router.post('/user/login', function(req, res) {
 });
 
 <!---- fetch data from mongodb through url -------->
-router.get('/user/get/:access_token', function(req, res) {
-    var access_token = req.params.access_token;
+router.get('/user/get/:id', function(req, res) {
+    var mongo_id = req.params.id;
     req.users.findOne({
-        "_id": access_token,
+        "_id": mongo_id,
     }, function(err, data) {
         if (err) {
-            res.json("Invalid token");
+            res.json("Invalid mongo_id");
         } else {
             res.json(data);
         }
@@ -71,11 +71,11 @@ router.get('/user/get/:access_token', function(req, res) {
 });
 
 <!---- Delete data from mongodb through url  ----->
-router.get('/user/delete/:access_token', function(req, res) {
-    var access_token = req.params.access_token;
-    req.users.findOne({ "_id": access_token }, function(err, data) {
+router.get('/user/delete/:id', function(req, res) {
+    var mongo_id = req.params.id;
+    req.users.findOne({ "_id": mongo_id }, function(err, data) {
         if (err) {
-            res.json("Invalid token");
+            res.json("Invalid mongo_id");
         } else if (data != null) {
             data.remove()
             res.json("Data removed from mongodb");

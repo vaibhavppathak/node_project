@@ -6,7 +6,7 @@ module.exports = function(req, res, next) {
     var endDate = moment();
     var Difference = endDate.diff(startDate);
     if (Difference < 60 * 60 * 1000) {
-        req.users.findOne({
+        req.access_token.findOne({
             _id: access_token[3]
         }, function(err, result) {
             if (err) {
