@@ -1,8 +1,8 @@
-var express = require('express');
+var express = require('express'); // Require express module
 var app=express()
-var mongoose = require('mongoose');
+var mongoose = require('mongoose'); //Require mongoose module
 var router = express.Router();  //creatig insatnce of express function
-var crypto =require('crypto');
+var crypto =require('crypto'); // Require crypto module for encryption
 
 <!---- insert data into mongodb ---->
 router.post('/user/register', function(req, res) {  
