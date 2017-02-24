@@ -1,8 +1,8 @@
-var crypto =require('crypto');
+var path=require("path")
 module.exports = function(req, res, next) {
-	var username = req.body.user_name;
-	if(username==null){
 	var token = req.url.split("/");
+	if(token[2]=="get"){
+	console.log(token);
 		req.access_token.findOne({
 			token: token[3]
 		},function(err, res1) {
@@ -16,6 +16,7 @@ module.exports = function(req, res, next) {
 			}
 		})
 	}else{
+		console.log("skiped");
 		next();
 	}
 };

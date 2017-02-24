@@ -13,7 +13,6 @@ app.use(bodyParser.json());
 app.use(db());
 app.use(validate);
 app.use('/', routes);
-
 // Listen to this Port
 app.listen(8080, function() {
     console.log("Server started at port number: 8080");
