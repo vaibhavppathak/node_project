@@ -14,10 +14,10 @@ module.exports = function() {
         strict: true,
         collection: 'users'
     });
-    var user = conn.model('USERS', userSchema);
 
+    var usercreate = conn.model('create', usercreate);
     return function(req, res, next) {
-        req.users = user;
+        req.users = usercreate;
         next();
     }
 }
