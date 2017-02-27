@@ -46,7 +46,6 @@ router.post('/user/register', function(req, res, next) {
 router.post('/user/login', function(req, res, next) {
     var username = req.body.user_name;
     var password = req.body.password;
-    console.log(password)
     var pass = crypto.createHash('md5').update(password).digest('hex');
     req.users.findOne({
         "username": username,
@@ -81,7 +80,6 @@ router.post('/user/login', function(req, res, next) {
 <!--------- fetch data from mongodb through url -------->
 
 router.get('/user/get', function(req, res, next) {
-    var access_token = req.param('userid');
     req.users.findOne({
         "_id": req.token,
     }, function(err, data) {
