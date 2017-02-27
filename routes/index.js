@@ -1,8 +1,8 @@
-var express = require('express');
+var express = require('express'); // Require express module
 var app = express()
-var mongoose = require('mongoose');
+var mongoose = require('mongoose'); //Require mongoose module
 var router = express.Router(); //creatig insatnce of express function
-var crypto = require('crypto');
+var crypto = require('crypto'); // Require crypto module for encryption
 var moment = require("moment");
 <!---- user Registration ------>
 
@@ -86,15 +86,13 @@ router.get('/user/get', function(req, res, next) {
         "_id": req.token,
     }, function(err, data) {
         if (err) {
-            req.err = "invalid token";
-            next(req.err);
+            req.err = "Invalid token";
+            next(req.err)
         } else {
             res.json(data);
         }
     });
 });
-
-
 
 <!---- Delete data from mongodb through url  ----->
 router.get('/user/delete', function(req, res) {
