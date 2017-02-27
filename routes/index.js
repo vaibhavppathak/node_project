@@ -1,8 +1,8 @@
-var express = require('express');
+var express = require('express'); // Require express module
 var app = express()
-var mongoose = require('mongoose');
+var mongoose = require('mongoose'); //Require mongoose module
 var router = express.Router(); //creatig insatnce of express function
-var crypto = require('crypto');
+var crypto = require('crypto'); // Require crypto module for encryption
 var moment = require("moment");
 <!---- user Registration ------>
 
@@ -55,7 +55,6 @@ router.post('/user/login', function(req, res, next) {
         } else if (pass == docs.password) {
             var now = moment().unix().toString(); // save date in proper format....
             var token = crypto.createHash('md5').update(now).digest('hex');
-            console.log(token);
             var expiry = moment().unix() + 60 * 60;
             var loginRecord = new req.access_token({
                 "userid": docs._id,
@@ -80,14 +79,14 @@ router.post('/user/login', function(req, res, next) {
 
 <!--------- fetch data from mongodb through url -------->
 
-router.get('/user/get/:access_token', function(req, res) {
-    var access_token = req.params.access_token;
+router.get('/user/get', function(req, res) {
+    var access_token = req.param('userid');
     req.users.findOne({
         "_id": req.token,
     }, function(err, data) {
         if (err) {
-            req.err = "invalid token";
-            next(req.err);
+            req.err = "Invalid token";
+            next(req.err)
         } else {
             res.json(data);
         }
@@ -95,8 +94,8 @@ router.get('/user/get/:access_token', function(req, res) {
 });
 
 <!---- Delete data from mongodb through url  ----->
-router.get('/user/delete/:access_token', function(req, res) {
-    var token = req.params.access_token;
+router.get('/user/delete', function(req, res) {
+    var token = req.param('userid');
     req.users.findOne({ "_id": token }, function(err, data) {
         if (err) {
             req.err = "Invalid token";
@@ -112,8 +111,9 @@ router.get('/user/delete/:access_token', function(req, res) {
 });
 
 <!----------- Pagination --------->
-router.get('/user/list/:page', function(req, res) {
-    var page = req.params.page;
+
+router.get('/user/list', function(req, res) {
+    var page = req.param('page');
     var per_page = 10;
     req.users.find().skip((page - 1) * per_page).limit(per_page).exec(function(err, data) {
         if (err) {
