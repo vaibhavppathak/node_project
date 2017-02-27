@@ -1,15 +1,17 @@
 var path = require("path");
 var moment = require("moment");
 module.exports = function(req, res, next) {
-    var token = req.url.split("/");
+    var token = req.param("accessToken");
     if (req.path != "/user/login" && req.path != "/user/register") {
         req.access_token.findOne({
-            userid: token[3]
+            userid: token
         }, function(err, result) {
             if (err) {
+                console.log(result)
                 req.err = 'you are not authenticated'
-                next();
+                next(req.err);
             } else if (!result) {
+                console.log(result)
                 req.err = 'you are not authenticated'
                 next(req.err)
             } else {

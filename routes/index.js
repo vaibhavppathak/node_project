@@ -46,7 +46,6 @@ router.post('/user/register', function(req, res, next) {
 router.post('/user/login', function(req, res, next) {
     var username = req.body.user_name;
     var password = req.body.password;
-    console.log(password)
     var pass = crypto.createHash('md5').update(password).digest('hex');
     req.users.findOne({
         "username": username,
@@ -55,11 +54,8 @@ router.post('/user/login', function(req, res, next) {
             res.json("Your username is not exist");
         } else if (pass == docs.password) {
             var now = moment().unix().toString(); // save date in proper format....
-            console.log(now);
             var token = crypto.createHash('md5').update(now).digest('hex');
-            console.log(token);
             var expiry = moment().unix() + 60 * 60;
-            console.log(expiry)
             var loginRecord = new req.access_token({
                 "userid": docs._id,
                 "token": token,
@@ -81,9 +77,9 @@ router.post('/user/login', function(req, res, next) {
     });
 });
 
-<!---- fetch data from mongodb through url -------->
-router.get('/user/get/:access_token', function(req, res) {
-    var access_token = req.params.access_token;
+<!--------- fetch data from mongodb through url -------->
+
+router.get('/user/get', function(req, res, next) {
     req.users.findOne({
         "_id": req.token,
     }, function(err, data) {
@@ -97,9 +93,8 @@ router.get('/user/get/:access_token', function(req, res) {
 });
 
 <!---- Delete data from mongodb through url  ----->
-router.get('/user/delete/:access_token', function(req, res) {
-    var token = req.params.access_token;
-    req.users.findOne({ "_id": token }, function(err, data) {
+router.get('/user/delete', function(req, res, next) {
+    req.users.findOne({ "_id": req.token }, function(err, data) {
         if (err) {
             req.err = "Invalid token";
             next(req.err)
@@ -114,7 +109,7 @@ router.get('/user/delete/:access_token', function(req, res) {
 });
 
 <!----------- Pagination --------->
-router.get('/user/list/:page', function(req, res) {
+router.get('/user/list/:page', function(req, res, next) {
     var page = req.params.page;
     var per_page = 10;
     req.users.find().skip((page - 1) * per_page).limit(per_page).exec(function(err, data) {
