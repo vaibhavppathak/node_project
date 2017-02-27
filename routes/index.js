@@ -96,4 +96,36 @@ router.get('/user/get/:access_token', function(req, res) {
         }
     });
 });
+
+// <!---- Delete data from mongodb through url  ----->
+// router.get('/user/delete/:access_token', function(req, res) {
+//     var token = req.params.access_token;
+//     req.users.findOne({ "_id": token }, function(err, data) {
+//         if (err) {
+//             req.err = "Invalid token";
+//             next(req.err)
+//         } else if (data != null) {
+//             data.remove()
+//             res.json("Data removed from mongodb");
+//         } else {
+//             req.err = "data not found";
+//             next(req.err);
+//         }
+//     });
+// });
+
+// <!----------- Pagination --------->
+// router.get('/user/list/:page', function(req, res) {
+//     var page = req.params.page;
+//     var per_page = 10;
+//     req.users.find().skip((page - 1) * per_page).limit(per_page).exec(function(err, data) {
+//         if (err) {
+//             req.err = "invalid page"
+//             next(req.err);
+//         } else {
+//             res.json({ data: data });
+//         }
+//     });
+// });
+
 module.exports = router;
