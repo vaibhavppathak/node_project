@@ -15,9 +15,20 @@ module.exports = function() {
         collection: 'users'
     });
 
-    var usercreate = conn.model('create', usercreate);
+    var loginSchema = mongoose.Schema({
+        userid: { type: String, required: true, index: { unique: true } },
+        token: { type: String, required: true },
+        expiry: { type: String, required: true }
+    }, {
+        strict: true,
+        collection: 'login'
+    });
+
+    var usercreate = conn.model('create', userSchema);
+    var access_token = conn.model('access_token', loginSchema);
     return function(req, res, next) {
         req.users = usercreate;
+        req.access_token = access_token;
         next();
     }
 }
