@@ -20,7 +20,6 @@ module.exports = function(req, res, next) {
                     req.token = result.userid;
                     next();
                 } else {
-                    l
                     req.access_token.findOne({ "token": result.token }, function(err, data) {
                         if (err) {
                             req.err = 'invalid token'
