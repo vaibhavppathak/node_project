@@ -1,8 +1,8 @@
 var express = require('express'); //require express module
-var mongoose = require('mongoose'); //require moongose module
 var app = express(); //creatig insatnce of express function
+var mongoose = require('mongoose'); //require moongose module
 var bodyParser = require('body-parser');
-var db = require('./mongodb/db.js');
+var db = require('./mongodb/db.js'); // create route for database
 var routes = require('./routes/index.js'); //create route for index
 var validate = require("./routes/validate.js");
 var crypto = require('crypto');
@@ -24,6 +24,7 @@ function errorHandler(err, req, res, next) {
     res.status(500)
     res.render('error', { error: err })
 }
+
 // Listen to this Port
 app.listen(3015, function() {
     console.log("Server started at port number: 3015");
