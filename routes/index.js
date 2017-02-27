@@ -46,7 +46,6 @@ router.post('/user/register', function(req, res, next) {
 router.post('/user/login', function(req, res, next) {
     var username = req.body.user_name;
     var password = req.body.password;
-    console.log(password)
     var pass = crypto.createHash('md5').update(password).digest('hex');
     req.users.findOne({
         "username": username,
@@ -55,11 +54,9 @@ router.post('/user/login', function(req, res, next) {
             res.json("Your username is not exist");
         } else if (pass == docs.password) {
             var now = moment().unix().toString(); // save date in proper format....
-            console.log(now);
             var token = crypto.createHash('md5').update(now).digest('hex');
             console.log(token);
             var expiry = moment().unix() + 60 * 60;
-            console.log(expiry)
             var loginRecord = new req.access_token({
                 "userid": docs._id,
                 "token": token,
@@ -96,8 +93,6 @@ router.get('/user/get/:access_token', function(req, res) {
         }
     });
 });
-
-
 
 <!---- Delete data from mongodb through url  ----->
 router.get('/user/delete/:access_token', function(req, res) {
