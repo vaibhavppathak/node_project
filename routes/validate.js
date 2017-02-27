@@ -7,13 +7,9 @@ module.exports = function(req, res, next) {
             userid: token
         }, function(err, result) {
             if (err) {
-                console.log(result)
-                req.err = 'you are not authenticated'
-                next(req.err);
+                res.status(400).send({ error: "You are not authenticated" });
             } else if (!result) {
-                console.log(result)
-                req.err = 'you are not authenticated'
-                next(req.err)
+                res.status(400).send({ error: "You are not authenticated" });
             } else {
                 var startDate = parseInt(result.expiry);
                 var endDate = moment().unix();
