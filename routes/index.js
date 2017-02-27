@@ -13,9 +13,9 @@ router.post('/user/register', function(req, res, next) {
     var email = req.body.email;
     var firstname = req.body.first_name;
     var lastname = req.body.last_name;
-    var pass = crypto.createHash('md5').update(password).digest('hex');
     if ((username.length > 0) && (password.length > 0) && (cpassword.length > 0) && (email.length > 0) && (firstname.length > 0) && (lastname.length > 0)) {
         if (password == cpassword) {
+            var pass = crypto.createHash('md5').update(password).digest('hex');
             var record = new req.users({
                 "username": username,
                 "password": pass,
@@ -25,16 +25,19 @@ router.post('/user/register', function(req, res, next) {
             });
             record.save(function(err, details) {
                 if (err) {
-                    next("user already exist");
+                    req.err = "user already exist";
+                    next(req.err);
                 } else {
-                    next("Record inserted successfully");
+                    res.json({ status: 1, message: "record sucessfully inserted" })
                 }
             });
         } else {
-            next("Password is not matched")
+            req.err = "password not matched";
+            next(req.err);
         }
     } else {
-        next("All field must be filled out");
+        req.err = "all fields are necessary";
+        next(req.err);
     }
 });
 
@@ -43,6 +46,7 @@ router.post('/user/register', function(req, res, next) {
 router.post('/user/login', function(req, res, next) {
     var username = req.body.user_name;
     var password = req.body.password;
+    console.log(password)
     var pass = crypto.createHash('md5').update(password).digest('hex');
     req.users.findOne({
         "username": username,
@@ -63,14 +67,16 @@ router.post('/user/login', function(req, res, next) {
             });
             loginRecord.save(function(err, details) {
                 if (err) {
-                    next("invalid login");
+                    req.err = "invalid login";
+                    next(req.err);
                 } else {
                     res.json({ status: 1, message: "data saved" })
                 }
             });
 
         } else {
-            res.status(500).send({ status: 0, message: "Invalid password" });
+            req.err = "invalid password";
+            next(req.err);
         }
     });
 });
@@ -83,7 +89,8 @@ router.get('/user/get/:access_token', function(req, res) {
         "_id": req.token,
     }, function(err, data) {
         if (err) {
-            res.json("Invalid token");
+            req.err = "invalid token";
+            next(req.err);
         } else {
             res.json(data);
         }
