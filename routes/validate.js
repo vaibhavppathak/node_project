@@ -7,9 +7,11 @@ module.exports = function(req, res, next) {
             userid: token[3]
         }, function(err, result) {
             if (err) {
-                res.json('you are not authenticated');
+                req.err = 'you are not authenticated'
+                next();
             } else if (!result) {
-                res.json('you are not authenticated');
+                req.err = 'you are not authenticated'
+                next(req.err)
             } else {
                 var startDate = parseInt(result.expiry);
                 var endDate = moment().unix();
@@ -18,7 +20,19 @@ module.exports = function(req, res, next) {
                     req.token = result.userid;
                     next();
                 } else {
-                    res.json("token expired");
+                    l
+                    req.access_token.findOne({ "token": result.token }, function(err, data) {
+                        if (err) {
+                            req.err = 'invalid token'
+                            next(req.err)
+                        } else if (data != null) {
+                            data.remove()
+                            res.json("token expired");
+                        } else {
+                            req.err = 'invalid token'
+                            next(req.err)
+                        }
+                    });
                 }
             }
         })
