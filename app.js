@@ -8,6 +8,7 @@ var validate = require("./routes/validate.js");
 var crypto = require('crypto');
 var moment = require("moment");
 var cors = require('cors');
+
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true })); //urlencoded within bodyParsar , extract data from <form> element
 app.use(bodyParser.json());

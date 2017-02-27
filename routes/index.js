@@ -83,8 +83,8 @@ router.post('/user/login', function(req, res, next) {
 
 <!--------- fetch data from mongodb through url -------->
 
-router.get('/user/get/:access_token', function(req, res) {
-    var access_token = req.params.access_token;
+router.get('/user/get', function(req, res) {
+    var access_token = req.param('userid');
     req.users.findOne({
         "_id": req.token,
     }, function(err, data) {
@@ -100,8 +100,8 @@ router.get('/user/get/:access_token', function(req, res) {
 
 
 <!---- Delete data from mongodb through url  ----->
-router.get('/user/delete/:access_token', function(req, res) {
-    var token = req.params.access_token;
+router.get('/user/delete', function(req, res) {
+    var token = req.param('userid');
     req.users.findOne({ "_id": token }, function(err, data) {
         if (err) {
             req.err = "Invalid token";
@@ -117,8 +117,8 @@ router.get('/user/delete/:access_token', function(req, res) {
 });
 
 <!----------- Pagination --------->
-router.get('/user/list/:page', function(req, res) {
-    var page = req.params.page;
+router.get('/user/list', function(req, res) {
+    var page = req.param('page');
     var per_page = 10;
     req.users.find().skip((page - 1) * per_page).limit(per_page).exec(function(err, data) {
         if (err) {
