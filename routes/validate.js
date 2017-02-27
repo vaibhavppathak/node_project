@@ -3,7 +3,7 @@ var moment = require("moment");
 module.exports = function(req, res, next) {
     var token = req.url.split("/");
     console.log(req.path)
-    if (req.path != "/user/login" && req.path != "/user/register") {
+    if (req.path != "/user/login" && req.path != "/user/register" && req.path != "/user/list") {
         req.access_token.findOne({
             userid: token[3]
         }, function(err, result) {
