@@ -95,8 +95,8 @@ router.get('/user/get', function(req, res, next) {
 });
 
 <!---- Delete data from mongodb through url  ----->
-router.get('/user/delete', function(req, res) {
-    req.users.findOne({ "_id": req.token }, function(err, data, next) {
+router.get('/user/delete', function(req, res, next) {
+    req.users.findOne({ "_id": req.token }, function(err, data) {
         if (err) {
             req.err = "Invalid token";
             next(req.err)
