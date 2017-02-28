@@ -8,7 +8,6 @@ module.exports = function(req, res, next) {
     } else {
         var token = req.body.access_token;
     }
-
     if (req.path != "/user/login" && req.path != "/user/register") {
         req.access_token.findOne({
             userid: token
