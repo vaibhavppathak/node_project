@@ -42,7 +42,6 @@ router.post('/user/register', function(req, res, next) {
 });
 
 <!--------- login -------->
-
 router.post('/user/login', function(req, res, next) {
     var username = req.body.user_name;
     var password = req.body.password;
@@ -70,13 +69,13 @@ router.post('/user/login', function(req, res, next) {
                             req.err = "invalid login";
                             next(req.err);
                         } else {
-                            res.json({ status: 1, message: "data saved" })
+                            res.json({ status: 1, access_token: docs._id, messgae: "login sucessfully" })
                         }
                     });
                 } else if (!error) {
                     req.access_token.findOneAndUpdate({ userid: docs._id }, { $set: { expiry: expiry } }, function(err1, res1) {
                         if (res1) {
-                            res.json({ status: 1, message: "login details updated" })
+                            res.json({ status: 1, access_token: docs._id, messgae: "login sucessfully" })
                             next()
                         } else {
                             req.err = err1
