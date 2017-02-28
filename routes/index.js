@@ -4,6 +4,7 @@ var mongoose = require('mongoose'); //Require mongoose module
 var router = express.Router(); //creatig insatnce of express function
 var crypto = require('crypto'); // Require crypto module for encryption
 var moment = require("moment");
+var jwt = require('jwt-simple');
 <!---- user Registration ------>
 
 router.post('/user/register', function(req, res, next) {
@@ -45,15 +46,21 @@ router.post('/user/register', function(req, res, next) {
 router.post('/user/login', function(req, res, next) {
     var username = req.body.user_name;
     var password = req.body.password;
+    var pass = crypto.createHash('md5').update(password).digest('hex');
     req.users.findOne({
         "username": username,
     }, function(err, docs) {
-        var pass = crypto.createHash('md5').update(password).digest('hex');
         if (err) {
             res.json("Your username is not exist");
-        } else if (pass == docs.password) {
+            next();
+        } else if (docs && pass == docs.password) {
             var now = moment().unix().toString(); // save date in proper format....
-            var token = crypto.createHash('md5').update(now).digest('hex');
+            var payload = { access_token: docs._id };
+            var secret = docs._id + "," + now;
+            // encode
+            var token = jwt.encode(payload, secret);
+            // decode
+            var decoded = jwt.decode(token, secret);
             var expiry = moment().unix() + 60 * 60;
             var loginRecord = new req.access_token({
                 "userid": docs._id,
@@ -68,14 +75,18 @@ router.post('/user/login', function(req, res, next) {
                         if (err) {
                             req.err = "invalid login";
                             next(req.err);
+                        } else if (result) {
+                            res.json({ status: 1, access_token: decoded.access_token, messgae: "login sucessfully" })
+                            next()
                         } else {
-                            res.json({ status: 1, access_token: docs._id, messgae: "login sucessfully" })
+                            req.err = "invalid login"
+                            next()
                         }
                     });
                 } else if (!error) {
                     req.access_token.findOneAndUpdate({ userid: docs._id }, { $set: { expiry: expiry } }, function(err1, res1) {
                         if (res1) {
-                            res.json({ status: 1, access_token: docs._id, messgae: "login sucessfully" })
+                            res.json({ status: 1, access_token: decoded.access_token, messgae: "login sucessfully" })
                             next()
                         } else {
                             req.err = err1
