@@ -1,13 +1,13 @@
 var path = require("path");
 var moment = require("moment");
 module.exports = function(req, res, next) {
-    console.log(req.body)
     if (req.param("accessToken")) {
         var token = req.param("accessToken");
         console.log(token);
     } else {
         var token = req.body.access_token;
     }
+
     if (req.path != "/user/login" && req.path != "/user/register") {
         req.access_token.findOne({
             userid: token
@@ -17,7 +17,7 @@ module.exports = function(req, res, next) {
                 next(req.err);
             } else if (!result) {
                 res.status(400).send({ error: "You are not authenticated" });
-                next(req.err)
+                next(req.err);
             } else {
                 var startDate = parseInt(result.expiry);
                 var endDate = moment().unix();

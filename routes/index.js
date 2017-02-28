@@ -123,6 +123,7 @@ router.get('/user/list/:page', function(req, res, next) {
     });
 });
 
+
 router.post('/user/address', function(req, res, next) {
     var access_token = req.body.access_token;
     var c_address = req.body.c_address;

@@ -4,6 +4,7 @@ module.exports = function() {
     var Schema = mongoose.Schema;
     var ObjectId = Schema.ObjectId;
     var conn = mongoose.connect('mongodb://127.0.0.1/Project'); //connection to mongodb
+
     // create schema 
     var userSchema = mongoose.Schema({
         username: { type: String, required: true, index: { unique: true } },
@@ -37,7 +38,6 @@ module.exports = function() {
         strict: true,
         collection: 'detail'
     });
-
 
     var user_create = conn.model('User', userSchema);
     var access_token = conn.model('ACCESS_TOKEN', loginSchema);
