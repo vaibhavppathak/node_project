@@ -14,7 +14,6 @@ module.exports = function() {
         strict: true,
         collection: 'users'
     });
-
     var loginSchema = mongoose.Schema({
         userid: { type: String, required: true, index: { unique: true } },
         token: { type: String, required: true },
