@@ -42,7 +42,6 @@ router.post('/user/register', function(req, res, next) {
 });
 
 <!--------- login -------->
-
 router.post('/user/login', function(req, res, next) {
     var username = req.body.user_name;
     var password = req.body.password;
