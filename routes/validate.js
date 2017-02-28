@@ -1,10 +1,16 @@
 var path = require("path");
 var moment = require("moment");
+var express = require('express'); // Require express module
+var app = express();
+var jwt = require('jsonwebtoken');
+app.set('view engine', 'ejs');
+
 module.exports = function(req, res, next) {
+    var token = req.param("accessToken");
     if (req.path != "/user/login" && req.path != "/user/register") {
-        var token = req.param("accessToken");
+        var decoded = jwt.verify(token, "xxx");
         req.access_token.findOne({
-            userid: token
+            userid: decoded.access_token
         }, function(err, result) {
             if (err) {
                 res.status(400).send({ error: "You are not authenticated" });
