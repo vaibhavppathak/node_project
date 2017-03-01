@@ -101,12 +101,19 @@ router.get('/user/list/:page', function(req, res, next) {
     var page = req.params.page;
     var token = req.param('accessToken');
     var per_page = 10;
+    var count;
+    req.users.count({}, function(error, num) {
+        count = num;
+    });
     req.users.find().skip((page - 1) * per_page).limit(per_page).exec(function(err, data) {
         if (err) {
             req.err = "invalid page"
             next(req.err);
+        } else if (data) {
+            res.json({ data: data, count: count });
         } else {
-            res.json({ data: data });
+            req.err = "invalid user"
+            next(req.err)
         }
     });
 });
