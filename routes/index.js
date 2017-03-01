@@ -4,6 +4,7 @@ var mongoose = require('mongoose'); //Require mongoose module
 var router = express.Router(); //creatig insatnce of express function
 var crypto = require('crypto'); // Require crypto module for encryption
 var moment = require("moment");
+var jwt = require('jsonwebtoken');
 <!---- user Registration ------>
 
 router.post('/user/register', function(req, res, next) {
@@ -44,48 +45,20 @@ router.post('/user/register', function(req, res, next) {
 <!--------- login -------->
 router.post('/user/login', function(req, res, next) {
     var username = req.body.user_name;
-    var password = req.body.password;
+    var password = crypto.createHash('md5').update(req.body.password).digest('hex');
     req.users.findOne({
         "username": username,
+        "password": password
     }, function(err, docs) {
-        var pass = crypto.createHash('md5').update(password).digest('hex');
         if (err) {
             res.json("Your username is not exist");
-        } else if (pass == docs.password) {
-            var now = moment().unix().toString(); // save date in proper format....
-            var token = crypto.createHash('md5').update(now).digest('hex');
-            var expiry = moment().unix() + 60 * 60;
-            var loginRecord = new req.access_token({
-                "userid": docs._id,
-                "token": token,
-                "expiry": expiry
-            });
-            req.access_token.findOne({
-                "userid": docs._id
-            }, function(error, result) {
-                if (!result) {
-                    loginRecord.save(function(err, details) {
-                        if (err) {
-                            req.err = "invalid login";
-                            next(req.err);
-                        } else {
-                            res.json({ status: 1, access_token: docs._id, messgae: "login sucessfully" })
-                        }
-                    });
-                } else if (!error) {
-                    req.access_token.findOneAndUpdate({ userid: docs._id }, { $set: { expiry: expiry } }, function(err1, res1) {
-                        if (res1) {
-                            res.json({ status: 1, access_token: docs._id, messgae: "login sucessfully" })
-                            next()
-                        } else {
-                            req.err = err1
-                            next();
-                        }
-                    })
-                }
-            })
+            next();
+        } else if (docs) {
+            var token = jwt.sign({ token: docs._id }, "xxx", { expiresIn: 60 * 60 });
+            res.json({ status: 1, token: token, messgae: "login sucessfully" })
+            next();
         } else {
-            req.err = "invalid password";
+            req.err = "invalid password or username";
             next(req.err);
         }
     });
@@ -125,16 +98,40 @@ router.get('/user/delete', function(req, res, next) {
 router.get('/user/list/:page', function(req, res, next) {
     var page = req.params.page;
     var per_page = 10;
-    req.users.find().skip((page - 1) * per_page).limit(per_page).exec(function(err, data) {
+    req.users.count({}, function(error, num) {
+        req.users.find().skip((page - 1) * per_page).limit(per_page).exec(function(err, data) {
+            if (err) {
+                req.err = "invalid page"
+                next(req.err);
+            } else if (data) {
+                res.json({ data: data, count: num });
+            } else {
+                req.err = "invalid user"
+                next(req.err)
+            }
+        });
+    });
+});
+<!-----------Sorting oF data-------------->
+router.get('/user/sort/:column/:type/:page', function(req, res, next) {
+    var column = req.params.column;
+    var type = req.params.type;
+    var page = req.params.page;
+    per_page = 10;
+    var query = {}
+    query[column] = type;
+    req.users.find().sort(query).skip((page - 1) * per_page).limit(per_page).exec(function(err, data) {
         if (err) {
             req.err = "invalid page"
             next(req.err);
-        } else {
+        } else if (data) {
             res.json({ data: data });
+        } else {
+            req.err = "invalid user"
+            next(req.err)
         }
     });
 });
-
 
 router.post('/user/address', function(req, res, next) {
     var access_token = req.body.access_token;
@@ -173,5 +170,4 @@ router.post('/user/address', function(req, res, next) {
         res.json("All field must be filled out");
     }
 });
-
 module.exports = router;

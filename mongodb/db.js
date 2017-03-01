@@ -29,22 +29,10 @@ module.exports = function() {
     });
 
 
-    var loginSchema = mongoose.Schema({
-        userid: { type: String, required: true, index: { unique: true } },
-        token: { type: String, required: true },
-        expiry: { type: String, required: true }
-    }, {
-        strict: true,
-        collection: 'access_token'
-    });
-
-
     var user_create = conn.model('users', userSchema);
-    var access_token = conn.model('access_token', loginSchema);
     var user_address = conn.model('address', user_address);
     return function(req, res, next) {
         req.users = user_create;
-        req.access_token = access_token;
         req.user_address = user_address;
         next();
     }
