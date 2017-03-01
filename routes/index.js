@@ -72,7 +72,6 @@ router.get('/user/get', function(req, res, next) {
             req.err = "Data not fetched";
             next(req.err)
         } else {
-            console.log(users);
             res.json({ status: 1, message: "Data fetched Successfully" })
         }
     });
