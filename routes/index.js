@@ -80,17 +80,15 @@ router.post('/user/login', function(req, res, next) {
 <!--------- fetch data from mongodb through url -------->
 
 router.get('/user/get', function(req, res, next) {
-    req.users
-        .find({})
-        .populate('User')
-        .exec(function(err, users) {
+    req.user_address.find().populate('user_id').exec(function(err, users) {
             if (err) {
-
-                console.log(err);
+                req.err = "Data not fetched";
+                next(req.err)
             } else {
-                console.log(users);
+                res.json({ status: 1, message: "Data fetched Successfully" })
             }
-        });
+        }
+    });
 });
 
 <!---- Delete data from mongodb through url  ----->
@@ -140,8 +138,7 @@ router.post('/user/address', function(req, res, next) {
             if (err) {
                 throw err;
             } else {
-                console.log(11111);
-                var record = new req.users_detail({
+                var record = new req.user_address({
                     "user_id": docs.id,
                     "address": address,
                     "city": city,
@@ -149,11 +146,11 @@ router.post('/user/address', function(req, res, next) {
                     "pin_code": pin_code,
                     "phone_no": phone_no,
                 });
-                record.save(function(err, details) {
+                record.save(function(err, docs) {
                     if (err) {
                         res.json("Record is not inserted")
                     } else {
-                        res.json({ "id": details.id });
+                        res.json({ "id": docs.id });
                     }
                 });
             }
