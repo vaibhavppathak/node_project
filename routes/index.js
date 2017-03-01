@@ -68,12 +68,12 @@ router.post('/user/login', function(req, res, next) {
 
 router.get('/user/get', function(req, res, next) {
     req.user_address.find().populate('user_id').exec(function(err, users) {
-            if (err) {
-                req.err = "Data not fetched";
-                next(req.err)
-            } else {
-                res.json({ status: 1, message: "Data fetched Successfully" })
-            }
+        if (err) {
+            req.err = "Data not fetched";
+            next(req.err)
+        } else {
+            console.log(users);
+            res.json({ status: 1, message: "Data fetched Successfully" })
         }
     });
 });
@@ -134,7 +134,6 @@ router.get('/user/sort/:column/:type/:page', function(req, res, next) {
 });
 
 router.post('/user/address', function(req, res, next) {
-    var access_token = req.body.access_token;
     var c_address = req.body.c_address;
     var p_address = req.body.p_address;
     var address = JSON.stringify([{ "current_address": c_address, "permanent_address": p_address }]);
