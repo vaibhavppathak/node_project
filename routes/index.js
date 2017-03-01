@@ -114,5 +114,24 @@ router.get('/user/list/:page', function(req, res, next) {
         });
     });
 });
-
+<!-----------Sorting oF data-------------->
+router.get('/user/sort/:column/:type/:page', function(req, res, next) {
+    var column = req.params.column;
+    var type = req.params.type;
+    var page = req.params.page;
+    per_page = 10;
+    var query = {}
+    query[column] = type;
+    req.users.find().sort(query).skip((page - 1) * per_page).limit(per_page).exec(function(err, data) {
+        if (err) {
+            req.err = "invalid page"
+            next(req.err);
+        } else if (data) {
+            res.json({ data: data });
+        } else {
+            req.err = "invalid user"
+            next(req.err)
+        }
+    });
+});
 module.exports = router;
