@@ -55,14 +55,7 @@ router.post('/user/login', function(req, res, next) {
             next();
         } else if (docs && pass == docs.password) {
             var now = moment().unix().toString(); // save date in proper format....
-            var token = jwt.sign({ access_token: docs._id }, "xxx");
-            // sign(access_token, secret);
-            // function sign(){
-
-            // }
-            // jwt.verify(token, app.get("superSecret"), function(err, decoded) {
-            //     console.log(decoded)
-            // });
+            var token = jwt.sign({ access_token: docs._id }, "xxx", { expiresIn: 60 * 60 });
             var expiry = moment().unix() + 60 * 60;
             var loginRecord = new req.access_token({
                 "userid": docs._id,
