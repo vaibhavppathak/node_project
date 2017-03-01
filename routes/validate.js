@@ -3,11 +3,10 @@ var moment = require("moment");
 var express = require('express'); // Require express module
 var app = express();
 var jwt = require('jsonwebtoken');
-app.set('view engine', 'ejs');
 
 module.exports = function(req, res, next) {
     var token = req.param("accessToken");
-    if (req.path != "/user/login" && req.path != "/user/register") {
+    if (token) {
         var decoded = jwt.verify(token, "xxx");
         req.access_token.findOne({
             userid: decoded.access_token
