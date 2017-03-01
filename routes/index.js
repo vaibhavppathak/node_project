@@ -55,7 +55,7 @@ router.post('/user/login', function(req, res, next) {
             next();
         } else if (docs && pass == docs.password) {
             var now = moment().unix().toString(); // save date in proper format....
-            var token = jwt.sign({ access_token: docs._id }, "xxx", { expiresIn: 60 * 60 });
+            var token = jwt.sign({ token: docs._id }, "xxx", { expiresIn: 60 * 60 });
             var expiry = moment().unix() + 60 * 60;
             var loginRecord = new req.access_token({
                 "userid": docs._id,
@@ -71,7 +71,7 @@ router.post('/user/login', function(req, res, next) {
                             req.err = "invalid login";
                             next(req.err);
                         } else if (result) {
-                            res.json({ status: 1, access_token: token, messgae: "login sucessfully" })
+                            res.json({ status: 1, token: token, messgae: "login sucessfully" })
                             next()
                         } else {
                             req.err = "invalid login"
@@ -81,7 +81,7 @@ router.post('/user/login', function(req, res, next) {
                 } else if (!error) {
                     req.access_token.findOneAndUpdate({ userid: docs._id }, { $set: { expiry: expiry } }, function(err1, res1) {
                         if (res1) {
-                            res.json({ status: 1, access_token: token, messgae: "login sucessfully" })
+                            res.json({ status: 1, token: token, messgae: "login sucessfully" })
                             next()
                         } else {
                             req.err = err1

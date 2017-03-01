@@ -8,13 +8,10 @@ module.exports = function(req, res, next) {
     var token = req.param("accessToken");
     if (token) {
         var decoded = jwt.verify(token, "xxx");
-        console.log(decoded)
         var endTime = moment().unix();
         var loginTime = decoded.exp;
-        console.log(endTime);
-        console.log(decoded.exp);
         if (decoded.exp > endTime) {
-            req.token = decoded.access_token;
+            req.token = decoded.token;
             next();
         } else {
             req.err = "Token expire"
