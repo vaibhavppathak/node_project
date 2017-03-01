@@ -100,13 +100,18 @@ router.get('/user/delete', function(req, res, next) {
 router.get('/user/list/:page', function(req, res, next) {
     var page = req.params.page;
     var per_page = 10;
-    req.users.find().skip((page - 1) * per_page).limit(per_page).exec(function(err, data) {
-        if (err) {
-            req.err = "invalid page"
-            next(req.err);
-        } else {
-            res.json({ data: data });
-        }
+    req.users.count({}, function(error, num) {
+        req.users.find().skip((page - 1) * per_page).limit(per_page).exec(function(err, data) {
+            if (err) {
+                req.err = "invalid page"
+                next(req.err);
+            } else if (data) {
+                res.json({ data: data, count: num });
+            } else {
+                req.err = "invalid user"
+                next(req.err)
+            }
+        });
     });
 });
 

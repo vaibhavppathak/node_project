@@ -18,6 +18,7 @@ module.exports = function(req, res, next) {
             next(req.err);
         }
     } else {
+        console.log("here")
         next()
     }
 };
