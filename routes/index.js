@@ -54,42 +54,9 @@ router.post('/user/login', function(req, res, next) {
             res.json("Your username is not exist");
             next();
         } else if (docs && pass == docs.password) {
-            var now = moment().unix().toString(); // save date in proper format....
             var token = jwt.sign({ token: docs._id }, "xxx", { expiresIn: 60 * 60 });
-            var expiry = moment().unix() + 60 * 60;
-            var loginRecord = new req.access_token({
-                "userid": docs._id,
-                "token": token,
-                "expiry": expiry
-            });
-            req.access_token.findOne({
-                "userid": docs._id
-            }, function(error, result) {
-                if (!result) {
-                    loginRecord.save(function(err, details) {
-                        if (err) {
-                            req.err = "invalid login";
-                            next(req.err);
-                        } else if (result) {
-                            res.json({ status: 1, token: token, messgae: "login sucessfully" })
-                            next()
-                        } else {
-                            req.err = "invalid login"
-                            next()
-                        }
-                    });
-                } else if (!error) {
-                    req.access_token.findOneAndUpdate({ userid: docs._id }, { $set: { expiry: expiry } }, function(err1, res1) {
-                        if (res1) {
-                            res.json({ status: 1, token: token, messgae: "login sucessfully" })
-                            next()
-                        } else {
-                            req.err = err1
-                            next();
-                        }
-                    })
-                }
-            })
+            res.json({ status: 1, token: token, messgae: "login sucessfully" })
+            next();
         } else {
             req.err = "invalid password";
             next(req.err);
