@@ -45,20 +45,20 @@ router.post('/user/register', function(req, res, next) {
 <!--------- login -------->
 router.post('/user/login', function(req, res, next) {
     var username = req.body.user_name;
-    var password = req.body.password;
-    var pass = crypto.createHash('md5').update(password).digest('hex');
+    var password = crypto.createHash('md5').update(req.body.password).digest('hex');
     req.users.findOne({
         "username": username,
+        "password": password
     }, function(err, docs) {
         if (err) {
             res.json("Your username is not exist");
             next();
-        } else if (docs && pass == docs.password) {
+        } else if (docs) {
             var token = jwt.sign({ token: docs._id }, "xxx", { expiresIn: 60 * 60 });
             res.json({ status: 1, token: token, messgae: "login sucessfully" })
             next();
         } else {
-            req.err = "invalid password";
+            req.err = "invalid password or username";
             next(req.err);
         }
     });
