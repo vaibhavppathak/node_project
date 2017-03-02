@@ -1,6 +1,8 @@
 // the middleware function
 module.exports = function() {
     var mongoose = require('mongoose'); //require mongoose module
+    var Schema = mongoose.Schema;
+    var ObjectId = Schema.ObjectId;
     var conn = mongoose.connect('mongodb://127.0.0.1/Project'); //connection to mongodb
 
     // create schema 
@@ -12,7 +14,6 @@ module.exports = function() {
         lastname: { type: String, required: true },
         address: { type: String, required: true, index: { unique: true }, ref: 'address' }
     }, {
-        strict: true,
         collection: 'users'
     });
 
@@ -26,10 +27,11 @@ module.exports = function() {
     }, {
         collection: 'address'
     });
-    var usercreate = conn.model('users', userSchema);
+
+    var user_create = conn.model('users', userSchema);
     var user_address = conn.model('address', user_address);
     return function(req, res, next) {
-        req.users = usercreate;
+        req.users = user_create;
         req.user_address = user_address;
         next();
     }
