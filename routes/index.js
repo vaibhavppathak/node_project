@@ -115,7 +115,7 @@ router.get('/user/list/:page', function(req, res, next) {
         });
     });
 });
-<!-----------Sorting oF data-------------->
+<!-----------Sorting of data-------------->
 router.get('/user/sort/:column/:type/:page', function(req, res, next) {
     var column = req.params.column;
     var type = req.params.type;
@@ -135,4 +135,14 @@ router.get('/user/sort/:column/:type/:page', function(req, res, next) {
         }
     });
 });
+
+<!------------searching of data-------------->
+router.get('/user/search/:keyword', function(req, res, next) {
+    var keyword = req.params.keyword;
+    req.users.find({ '$or': [{ firstname: new RegExp(keyword, 'i') }, { lastname: new RegExp(keyword, 'i') }, { username: new RegExp(keyword, 'i') }, { email: new RegExp(keyword, 'i') }, { address: new RegExp(keyword, 'i') }] }, function(err, data) {
+        res.json({ data: data })
+        next();
+    })
+});
+
 module.exports = router;
