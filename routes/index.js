@@ -140,8 +140,16 @@ router.get('/user/sort/:column/:type/:page', function(req, res, next) {
 router.get('/user/search/:keyword', function(req, res, next) {
     var keyword = req.params.keyword;
     req.users.find({ '$or': [{ firstname: new RegExp(keyword, 'i') }, { lastname: new RegExp(keyword, 'i') }, { username: new RegExp(keyword, 'i') }, { email: new RegExp(keyword, 'i') }, { address: new RegExp(keyword, 'i') }] }, function(err, data) {
-        res.json({ data: data })
-        next();
+        if (err) {
+            req.err("some error")
+            next(req.err);
+        } else if (data) {
+            res.json({ data: data })
+            next();
+        } else {
+            req.err = "data not found";
+            next(req.err)
+        }
     })
 });
 
