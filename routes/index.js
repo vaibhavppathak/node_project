@@ -139,18 +139,17 @@ router.get('/user/sort/:column/:type/:page', function(req, res, next) {
 <!------------searching of data-------------->
 router.get('/user/search/:keyword', function(req, res, next) {
     var keyword = req.params.keyword;
-    req.users.find({ '$or': [{ firstname: new RegExp(keyword, 'i') }, { lastname: new RegExp(keyword, 'i') }, { username: new RegExp(keyword, 'i') }, { email: new RegExp(keyword, 'i') }, { address: new RegExp(keyword, 'i') }] }, function(err, data) {
+    req.users.find({ '$or': [{ firstname: new RegExp(keyword, 'i') }, { lastname: new RegExp(keyword, 'i') }, { username: new RegExp(keyword, 'i') }, { email: new RegExp(keyword, 'i') }] }).populate('address').exec(function(err, users) {
         if (err) {
-            req.err("some error")
-            next(req.err);
-        } else if (data) {
-            res.json({ data: data })
-            next();
-        } else {
-            req.err = "data not found";
+            req.err = "Data not fetched";
             next(req.err)
+        } else if (users) {
+            res.json({ status: 1, data: users })
+        } else {
+            req.err = "data not found"
+            next(req.err);
         }
-    })
+    });
 });
 
 module.exports = router;

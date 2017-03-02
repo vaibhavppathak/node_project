@@ -10,14 +10,27 @@ module.exports = function() {
         email: { type: String, required: true, index: { unique: true } },
         firstname: { type: String, required: true },
         lastname: { type: String, required: true },
+        address: { type: String, required: true, index: { unique: true }, ref: 'address' }
     }, {
         strict: true,
         collection: 'users'
     });
 
-    var usercreate = conn.model('create', userSchema);
+    var user_address = mongoose.Schema({
+        user_id: { type: String, required: true, index: { unique: true }, ref: 'users' },
+        address: { type: String, required: true },
+        city: { type: String, required: true },
+        state: { type: String, required: true },
+        pin_code: { type: String, required: true },
+        phone_no: { type: String, required: true },
+    }, {
+        collection: 'address'
+    });
+    var usercreate = conn.model('users', userSchema);
+    var user_address = conn.model('address', user_address);
     return function(req, res, next) {
         req.users = usercreate;
+        req.user_address = user_address;
         next();
     }
 }
