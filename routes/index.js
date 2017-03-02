@@ -159,7 +159,8 @@ router.post('/user/address', function(req, res, next) {
                     if (err) {
                         res.json("Record is not inserted")
                     } else {
-                        res.json({ "id": docs.id });
+                        res.json({ status: 1, messgae: "address inserted sucessfully" })
+                        next();
                     }
                 });
             }

@@ -12,13 +12,12 @@ module.exports = function() {
         email: { type: String, required: true, index: { unique: true } },
         firstname: { type: String, required: true },
         lastname: { type: String, required: true },
-        address: [{ type: Schema.Types.ObjectId, ref: 'address' }]
     }, {
         collection: 'users'
     });
 
     var user_address = mongoose.Schema({
-        user_id: { type: String, required: true, ref: 'users' },
+        user_id: { type: String, required: true, index: { unique: true }, ref: 'users' },
         address: { type: String, required: true },
         city: { type: String, required: true },
         state: { type: String, required: true },
