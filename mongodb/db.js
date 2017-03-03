@@ -12,7 +12,6 @@ module.exports = function() {
         email: { type: String, required: true, index: { unique: true } },
         firstname: { type: String, required: true },
         lastname: { type: String, required: true },
-        address: { type: String, required: true, index: { unique: true }, ref: 'address' }
     }, {
         collection: 'users'
     });
