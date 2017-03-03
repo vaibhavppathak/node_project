@@ -5,7 +5,8 @@ var router = express.Router(); //creatig insatnce of express function
 var crypto = require('crypto'); // Require crypto module for encryption
 var moment = require("moment");
 var jwt = require('jsonwebtoken');
-<!---- user Registration ------>
+var async = require("async")
+    <!---- user Registration ------>
 
 router.post('/user/register', function(req, res, next) {
     var username = req.body.user_name;
