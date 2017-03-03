@@ -169,4 +169,30 @@ router.post('/user/address', function(req, res, next) {
         res.json("All field must be filled out");
     }
 });
+<!------------searching of data-------------->
+router.get('/user/search/:keyword', function(req, res, next) {
+    var keyword = req.params.keyword;
+    req.users.find({ '$or': [{ firstname: new RegExp(keyword, 'i') }, { lastname: new RegExp(keyword, 'i') }, { username: new RegExp(keyword, 'i') }, { email: new RegExp(keyword, 'i') }] }).populate('user_id').exec(function(err, users) {
+        if (err) {
+            req.err = "Data not fetched";
+            next(req.err)
+        } else {
+            var detail = [];
+            async.eachSeries(users, function(error, result) {
+                req.user_address.find({ userid: users._id }).exec(function(error, data) {
+                    if (error) {
+                        req.err = "some error"
+                        next(req.err)
+
+                    } else if (!data) {
+                        req.err = "data not fount"
+                        next(req.err)
+                    } else {
+                        res.json({ status: 1, users: users, address: data })
+                    }
+                });
+            });
+        }
+    });
+});
 module.exports = router;
