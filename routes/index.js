@@ -5,6 +5,7 @@ var router = express.Router(); //creatig insatnce of express function
 var crypto = require('crypto'); // Require crypto module for encryption
 var moment = require("moment");
 var jwt = require('jsonwebtoken');
+var async = require("async");
 <!---- user Registration ------>
 
 router.post('/user/register', function(req, res, next) {
@@ -65,17 +66,13 @@ router.post('/user/login', function(req, res, next) {
 });
 
 <!--------- fetch data from mongodb through url -------->
-
 router.get('/user/get', function(req, res, next) {
-    req.users.findOne({
-        "_id": req.token,
-    }, function(err, data) {
+    req.user_address.find().populate('user_id').exec(function(err, users) {
         if (err) {
-            req.err = "Invalid token";
+            req.err = "Data not fetched";
             next(req.err)
         } else {
-            res.json(data);
-            next()
+            res.json({ status: 1, message: "Data fetched Successfully" })
         }
     });
 });
@@ -139,23 +136,30 @@ router.get('/user/sort/:column/:type/:page', function(req, res, next) {
 <!------------searching of data-------------->
 router.get('/user/search/:keyword', function(req, res, next) {
     var keyword = req.params.keyword;
-    req.user_address.find({}).populate('user_id').exec(function(err, users) {
+    req.users.find({ '$or': [{ firstname: new RegExp(keyword, 'i') }, { lastname: new RegExp(keyword, 'i') }, { username: new RegExp(keyword, 'i') }, { email: new RegExp(keyword, 'i') }] }).populate('user_id').exec(function(err, users) {
         if (err) {
             req.err = "Data not fetched";
             next(req.err)
         } else {
-            var key;
-            var result = [];
-            for (key in users) {
-                if (users[key].user_id.firstname.indexOf(keyword) >= 0 || users[key].user_id.lastname.indexOf(keyword) >= 0 || users[key].user_id.username.indexOf(keyword) >= 0 || users[key].user_id.email.indexOf(keyword) >= 0 || users[key].address.indexOf(keyword) >= 0 || users[key].pin_code.indexOf(keyword) >= 0 || users[key].state.indexOf(keyword) >= 0 || users[key].city.indexOf(keyword) >= 0 || users[key].phone_no.indexOf(keyword) >= 0) {
-                    result.push(users[key]);
-                } else {
-                    continue;
-                }
-            }
-            res.json({ result: result })
+            var detail = [];
+            async.eachSeries(users, function(error, result) {
+                req.user_address.find({ userid: users._id }).exec(function(error, data) {
+                    if (error) {
+                        req.err = "some error"
+                        next(req.err)
+
+                    } else if (!data) {
+                        req.err = "data not fount"
+                        next(req.err)
+                    } else {
+                        res.json({ status: 1, users: users, address: data })
+                    }
+                });
+            });
         }
     });
 });
+
+
 
 module.exports = router;
