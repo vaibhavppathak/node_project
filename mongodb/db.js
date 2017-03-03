@@ -27,7 +27,6 @@ module.exports = function() {
         collection: 'address'
     });
 
-
     var user_create = conn.model('users', userSchema);
     var user_address = conn.model('address', user_address);
     return function(req, res, next) {

@@ -5,7 +5,7 @@ var app = express();
 var jwt = require('jsonwebtoken');
 
 module.exports = function(req, res, next) {
-    var token = req.param("accessToken");
+    var token = req.param("accessToken")
     if (token) {
         var decoded = jwt.verify(token, "xxx");
         var endTime = moment().unix();
