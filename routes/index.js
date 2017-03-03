@@ -5,6 +5,7 @@ var router = express.Router(); //creatig insatnce of express function
 var crypto = require('crypto'); // Require crypto module for encryption
 var moment = require("moment");
 var jwt = require('jsonwebtoken');
+var async = require("async");
 <!---- user Registration ------>
 
 router.post('/user/register', function(req, res, next) {
@@ -65,7 +66,6 @@ router.post('/user/login', function(req, res, next) {
 });
 
 <!--------- fetch data from mongodb through url -------->
-
 router.get('/user/get', function(req, res, next) {
     req.user_address.find().populate('user_id').exec(function(err, users) {
         if (err) {
@@ -96,6 +96,7 @@ router.get('/user/delete', function(req, res, next) {
 <!----------- Pagination --------->
 router.get('/user/list/:page', function(req, res, next) {
     var page = req.params.page;
+    var token = req.param('accessToken');
     var per_page = 10;
     req.users.count({}, function(error, num) {
         req.users.find().skip((page - 1) * per_page).limit(per_page).exec(function(err, data) {
@@ -111,7 +112,7 @@ router.get('/user/list/:page', function(req, res, next) {
         });
     });
 });
-<!-----------Sorting oF data-------------->
+<!-----------Sorting of data-------------->
 router.get('/user/sort/:column/:type/:page', function(req, res, next) {
     var column = req.params.column;
     var type = req.params.type;
@@ -132,42 +133,58 @@ router.get('/user/sort/:column/:type/:page', function(req, res, next) {
     });
 });
 
-router.post('/user/address', function(req, res, next) {
-    var c_address = req.body.c_address;
-    var p_address = req.body.p_address;
-    var address = JSON.stringify([{ "current_address": c_address, "permanent_address": p_address }]);
-    var city = req.body.city;
-    var state = req.body.state;
-    var pin_code = req.body.pin_code;
-    var phone_no = req.body.phone_no;
-    if ((c_address.length > 0) && (p_address.length > 0) && (city.length > 0) && (state.length > 0) && (pin_code.length > 0) && (phone_no.length > 0)) {
-        req.users.findOne({
-            "_id": req.token,
-        }, function(err, docs) {
-            if (err) {
-                throw err;
-            } else {
-                var record = new req.user_address({
-                    "user_id": docs.id,
-                    "address": address,
-                    "city": city,
-                    "state": state,
-                    "pin_code": pin_code,
-                    "phone_no": phone_no,
-                });
-                record.save(function(err, docs) {
-                    if (err) {
-                        res.json("Record is not inserted")
+<!------------searching of data-------------->
+router.get('/user/search/:keyword', function(req, res, next) {
+    var keyword = req.params.keyword;
+    req.users.find({ '$or': [{ firstname: new RegExp(keyword, 'i') }, { lastname: new RegExp(keyword, 'i') }, { username: new RegExp(keyword, 'i') }, { email: new RegExp(keyword, 'i') }] }).populate('user_id').exec(function(err, users) {
+        if (err) {
+            req.err = "Data not fetched";
+            next(req.err)
+        } else {
+            var detail = [];
+            async.eachSeries(users, function(error, result) {
+                req.user_address.find({ userid: users._id }).exec(function(error, data) {
+                    if (error) {
+                        req.err = "some error"
+                        next(req.err)
+
+                    } else if (!data) {
+                        req.err = "data not fount"
+                        next(req.err)
                     } else {
-                        res.json({ status: 1, messgae: "address inserted sucessfully" })
-                        next();
+                        res.json({ status: 1, users: users, address: data })
                     }
                 });
-            }
-        });
-    } else {
-        res.json("All field must be filled out");
-    }
+            });
+        }
+    });
+});
+
+<!------------searching of data-------------->
+router.get('/user/search/:keyword', function(req, res, next) {
+    var keyword = req.params.keyword;
+    req.users.find({ '$or': [{ firstname: new RegExp(keyword, 'i') }, { lastname: new RegExp(keyword, 'i') }, { username: new RegExp(keyword, 'i') }, { email: new RegExp(keyword, 'i') }] }).populate('user_id').exec(function(err, users) {
+        if (err) {
+            req.err = "Data not fetched";
+            next(req.err)
+        } else {
+            var detail = [];
+            async.eachSeries(users, function(error, result) {
+                req.user_address.find({ userid: users._id }).exec(function(error, data) {
+                    if (error) {
+                        req.err = "some error"
+                        next(req.err)
+
+                    } else if (!data) {
+                        req.err = "data not fount"
+                        next(req.err)
+                    } else {
+                        res.json({ status: 1, users: users, address: data })
+                    }
+                });
+            });
+        }
+    });
 });
 
 module.exports = router;
