@@ -7,9 +7,7 @@ var moment = require("moment");
 var jwt = require('jsonwebtoken');
 var async = require("async");
 
-
 <!---- user Registration ------>
-
 router.post('/user/register', function(req, res, next) {
     var username = req.body.user_name;
     var password = req.body.password;
