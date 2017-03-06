@@ -27,8 +27,16 @@ router.post('/user/register', function(req, res, next) {
             });
             record.save(function(err, details) {
                 if (err) {
-                    req.err = "user already exist";
-                    next(req.err);
+                    req.users.findOne({ '$or': [{ "username": username }, { "email": email }] }).exec(function(error, user) {
+                        if (user.username == username) {
+                            req.err = "username already used";
+                            next(req.err);
+                        } else {
+                            req.err = "email already used";
+                            next(req.err);
+                        }
+                    })
+
                 } else {
                     res.json({ status: 1, message: "record sucessfully inserted" })
                 }
