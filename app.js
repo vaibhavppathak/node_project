@@ -18,7 +18,7 @@ app.use('/', routes);
 app.use(errorHandler);
 
 function errorHandler(err, req, res, next) {
-    if (req.err) {
+    if (err) {
         return next(err)
     }
     res.status(500);
