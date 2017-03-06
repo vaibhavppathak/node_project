@@ -4,24 +4,18 @@ var path = require('path');
 var mongoose = require('mongoose'); //require moongose module
 var db = require('./mongodb/db.js'); // create route for database
 var bodyParser = require('body-parser');
-// var validate = require("./routes/validate.js");
+var validate = require("./routes/validate.js");
 var routes = require('./routes/index.js'); //create route for index
 var crypto = require('crypto');
-// var moment = require("moment");
+var moment = require("moment");
 var cors = require('cors');
-var bodyParser = require('body-parser');
-var passport = require('passport');
-var LocalStrategy = require('passport-local').Strategy;
-var session = require('express-session');
 
 
 app.use(cors());
 app.use(db());
-// app.use(validate);
+app.use(validate);
 app.use(bodyParser.json()); // body-parser for retrieving form data
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(passport.initialize());
-app.use(passport.session());;
 app.use('/', routes);
 app.use(errorHandler);
 

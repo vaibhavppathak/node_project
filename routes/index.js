@@ -5,9 +5,8 @@ var router = express.Router(); //creatig insatnce of express function
 var crypto = require('crypto'); // Require crypto module for encryption
 var moment = require("moment");
 var jwt = require('jsonwebtoken');
-var passport = require('passport')
-var LocalStrategy = require('passport-local').Strategy;
-var users;
+var async = require("async");
+
 
 <!---- user Registration ------>
 
@@ -48,39 +47,25 @@ router.post('/user/register', function(req, res, next) {
 
 
 <!--------- login -------->
-
-router.post('/user/login', passport.authenticate('local', {
-    successRedirect: '/user/get',
-    failureRedirect: '/user/login',
-    failureFlash: true,
-}));
-// define the local authentication strategy
-passport.use(new LocalStrategy({
-        username: 'username',
-        password: 'password',
-        passReqToCallback: true
-    },
-    function(req, username, password, done) {
-        var pass = crypto.createHash('md5').update(password).digest('hex');
-        req.users.findOne({ username: username }, function(err, user) {
-            if (err) {
-                return done(err);
-            }
-            if (!user) {
-                return done(null, false, { message: 'Incorrect username.' });
-            }
-            if (user.password != pass) {
-                return done(null, false, { message: 'Incorrect password.' });
-            }
-            return done(null, user);
-        });
-    }));
-passport.serializeUser(function(user, done) {
-    done(null, user);
-});
-
-passport.deserializeUser(function(user, done) {
-    done(null, user);
+router.post('/user/login', function(req, res, next) {
+    var username = req.body.user_name;
+    var password = crypto.createHash('md5').update(req.body.password).digest('hex');
+    req.users.findOne({
+        "username": username,
+        "password": password
+    }, function(err, docs) {
+        if (err) {
+            res.json("Your username is not exist");
+            next();
+        } else if (docs) {
+            var token = jwt.sign({ token: docs._id }, "secret_key", { expiresIn: 60 * 60 });
+            res.json({ status: 1, token: token, messgae: "login sucessfully" })
+            next();
+        } else {
+            req.err = "invalid password or username";
+            next(req.err);
+        }
+    });
 });
 
 
@@ -189,4 +174,33 @@ router.post('/user/address', function(req, res, next) {
         res.json("All field must be filled out");
     }
 });
+
+<!------------searching of data-------------->
+router.get('/user/search/:keyword', function(req, res, next) {
+    var keyword = req.params.keyword;
+    req.users.find({ '$or': [{ firstname: new RegExp(keyword, 'i') }, { lastname: new RegExp(keyword, 'i') }, { username: new RegExp(keyword, 'i') }, { email: new RegExp(keyword, 'i') }] }).populate('user_id').exec(function(err, users) {
+        if (err) {
+            req.err = "Data not fetched";
+            next(req.err)
+        } else {
+            var detail = [];
+            async.eachSeries(users, function(error, result) {
+                req.user_address.find({ userid: users._id }).exec(function(error, data) {
+                    if (error) {
+                        req.err = "some error"
+                        next(req.err)
+
+                    } else if (!data) {
+                        req.err = "data not fount"
+                        next(req.err)
+                    } else {
+                        res.json({ status: 1, users: users, address: data })
+                    }
+                });
+            });
+        }
+    });
+});
+
+
 module.exports = router;
