@@ -5,9 +5,9 @@ var app = express();
 var jwt = require('jsonwebtoken');
 
 module.exports = function(req, res, next) {
-    var token = req.param("accessToken");
-    if (token) {
-        var decoded = jwt.verify(token, "secret");
+    var token = req.param("accessToken")
+    if ((req.path != "/user/login" && req.path != "/user/register")) {
+        var decoded = jwt.verify(token, "xxx");
         var endTime = moment().unix();
         var loginTime = decoded.exp;
         if (decoded.exp > endTime) {

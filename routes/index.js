@@ -7,7 +7,6 @@ var moment = require("moment");
 var jwt = require('jsonwebtoken');
 var async = require("async");
 
-
 <!---- user Registration ------>
 
 router.post('/user/register', function(req, res, next) {
@@ -45,8 +44,8 @@ router.post('/user/register', function(req, res, next) {
     }
 });
 
-
 <!--------- login -------->
+
 router.post('/user/login', function(req, res, next) {
     var username = req.body.user_name;
     var password = crypto.createHash('md5').update(req.body.password).digest('hex');
@@ -68,7 +67,6 @@ router.post('/user/login', function(req, res, next) {
     });
 });
 
-
 <!--------- fetch data from mongodb through url -------->
 
 router.get('/user/get', function(req, res, next) {
@@ -83,6 +81,7 @@ router.get('/user/get', function(req, res, next) {
 });
 
 <!---- Delete data from mongodb through url  ----->
+
 router.get('/user/delete', function(req, res, next) {
     req.users.findOne({ "_id": req.token }, function(err, data) {
         if (err) {
@@ -99,6 +98,7 @@ router.get('/user/delete', function(req, res, next) {
 });
 
 <!----------- Pagination --------->
+
 router.get('/user/list/:page', function(req, res, next) {
     var page = req.params.page;
     var per_page = 10;
@@ -116,7 +116,9 @@ router.get('/user/list/:page', function(req, res, next) {
         });
     });
 });
+
 <!-----------Sorting oF data-------------->
+
 router.get('/user/sort/:column/:type/:page', function(req, res, next) {
     var column = req.params.column;
     var type = req.params.type;
@@ -176,6 +178,7 @@ router.post('/user/address', function(req, res, next) {
 });
 
 <!------------searching of data-------------->
+
 router.get('/user/search/:keyword', function(req, res, next) {
     var keyword = req.params.keyword;
     req.users.find({ '$or': [{ firstname: new RegExp(keyword, 'i') }, { lastname: new RegExp(keyword, 'i') }, { username: new RegExp(keyword, 'i') }, { email: new RegExp(keyword, 'i') }] }).populate('user_id').exec(function(err, users) {
@@ -201,6 +204,5 @@ router.get('/user/search/:keyword', function(req, res, next) {
         }
     });
 });
-
 
 module.exports = router;
