@@ -5,8 +5,9 @@ var router = express.Router(); //creatig insatnce of express function
 var crypto = require('crypto'); // Require crypto module for encryption
 var moment = require("moment");
 var jwt = require('jsonwebtoken');
-var async = require("async")
-    <!---- user Registration ------>
+var async = require("async");
+
+<!---- user Registration ------>
 
 router.post('/user/register', function(req, res, next) {
     var username = req.body.user_name;
@@ -52,6 +53,7 @@ router.post('/user/register', function(req, res, next) {
 });
 
 <!--------- login -------->
+
 router.post('/user/login', function(req, res, next) {
     var username = req.body.user_name;
     var password = crypto.createHash('md5').update(req.body.password).digest('hex');
@@ -81,12 +83,13 @@ router.get('/user/get', function(req, res, next) {
             req.err = "Data not fetched";
             next(req.err)
         } else {
-            res.json({ status: 1, message: "Data fetched Successfully" })
+            res.json({ status: 1, message: users })
         }
     });
 });
 
 <!---- Delete data from mongodb through url  ----->
+
 router.get('/user/delete', function(req, res, next) {
     req.users.findOne({ "_id": req.token }, function(err, data) {
         if (err) {
@@ -103,6 +106,7 @@ router.get('/user/delete', function(req, res, next) {
 });
 
 <!----------- Pagination --------->
+
 router.get('/user/list/:page', function(req, res, next) {
     var page = req.params.page;
     var per_page = 10;
@@ -120,7 +124,9 @@ router.get('/user/list/:page', function(req, res, next) {
         });
     });
 });
+
 <!-----------Sorting oF data-------------->
+
 router.get('/user/sort/:column/:type/:page', function(req, res, next) {
     var column = req.params.column;
     var type = req.params.type;
@@ -141,6 +147,8 @@ router.get('/user/sort/:column/:type/:page', function(req, res, next) {
     });
 });
 
+<!------- Address API ------->
+
 router.post('/user/address', function(req, res, next) {
     var c_address = req.body.c_address;
     var p_address = req.body.p_address;
@@ -149,29 +157,22 @@ router.post('/user/address', function(req, res, next) {
     var state = req.body.state;
     var pin_code = req.body.pin_code;
     var phone_no = req.body.phone_no;
+    var id = req.token;
     if ((c_address.length > 0) && (p_address.length > 0) && (city.length > 0) && (state.length > 0) && (pin_code.length > 0) && (phone_no.length > 0)) {
-        req.users.findOne({
-            "_id": req.token,
-        }, function(err, docs) {
+        var record = new req.user_address({
+            "user_id": id,
+            "address": address,
+            "city": city,
+            "state": state,
+            "pin_code": pin_code,
+            "phone_no": phone_no,
+        });
+        record.save(function(err, docs) {
             if (err) {
-                throw err;
+                res.json("Records are already exists")
             } else {
-                var record = new req.user_address({
-                    "user_id": docs.id,
-                    "address": address,
-                    "city": city,
-                    "state": state,
-                    "pin_code": pin_code,
-                    "phone_no": phone_no,
-                });
-                record.save(function(err, docs) {
-                    if (err) {
-                        res.json("Record is not inserted")
-                    } else {
-                        res.json({ status: 1, messgae: "address inserted sucessfully" })
-                        next();
-                    }
-                });
+                res.json({ status: 1, messgae: "address inserted sucessfully" })
+                next();
             }
         });
     } else {
@@ -180,6 +181,7 @@ router.post('/user/address', function(req, res, next) {
 });
 
 <!------------searching of data-------------->
+
 router.get('/user/search/:keyword', function(req, res, next) {
     var keyword = req.params.keyword;
     req.users.find({ '$or': [{ firstname: new RegExp(keyword, 'i') }, { lastname: new RegExp(keyword, 'i') }, { username: new RegExp(keyword, 'i') }, { email: new RegExp(keyword, 'i') }] }).populate('user_id').exec(function(err, users) {
