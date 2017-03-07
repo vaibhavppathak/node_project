@@ -11,7 +11,7 @@ module.exports = function(req, res, next) {
         var endTime = moment().unix();
         var loginTime = decoded.exp;
         if (decoded.exp > endTime) {
-            req.token = decoded.token;
+            req.user_id = decoded.token;
             next();
         } else {
             req.err = "Token expire"

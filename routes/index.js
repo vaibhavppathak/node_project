@@ -88,7 +88,7 @@ router.get('/user/get', function(req, res, next) {
 
 <!---- Delete data from mongodb through url  ----->
 router.get('/user/delete', function(req, res, next) {
-    req.users.findOne({ "_id": req.token }, function(err, data) {
+    req.users.findOne({ "_id": req.user_id }, function(err, data) {
         if (err) {
             req.err = "Invalid token";
             next(req.err)
@@ -152,10 +152,10 @@ router.post('/user/address', function(req, res, next) {
     var state = req.body.state;
     var pin_code = req.body.pin_code;
     var phone_no = req.body.phone_no;
-    var id = req.token;
+    var user_id = req.user_id;
     if ((c_address.length > 0) && (p_address.length > 0) && (city.length > 0) && (state.length > 0) && (pin_code.length > 0) && (phone_no.length > 0)) {
         var record = new req.user_address({
-            "user_id": id,
+            "user_id": user_id,
             "address": address,
             "city": city,
             "state": state,
