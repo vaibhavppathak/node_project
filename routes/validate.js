@@ -12,7 +12,6 @@ module.exports = function(req, res, next) {
                 req.err = "token expired"
                 next(req.err);
             } else {
-                decoded = result;
                 var endTime = moment().unix();
                 var loginTime = decoded.exp;
                 if (decoded.exp > endTime) {
