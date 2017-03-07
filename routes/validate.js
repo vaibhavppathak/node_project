@@ -13,7 +13,6 @@ module.exports = function(req, res, next) {
                 next(req.err);
             } else {
                 decoded = result;
-                console.log(decoded)
                 var endTime = moment().unix();
                 var loginTime = decoded.exp;
                 if (decoded.exp > endTime) {
