@@ -164,14 +164,16 @@ router.post('/user/address', function(req, res, next) {
         });
         record.save(function(err, docs) {
             if (err) {
-                res.json("Records are already exists")
+                req.err = "Records are already exists";
+                next(req.err)
             } else {
                 res.json({ status: 1, messgae: "address inserted sucessfully" })
                 next();
             }
         });
     } else {
-        res.json("All field must be filled out");
+        req.err = "All field must be filled out";
+        next(req.err)
     }
 });
 
