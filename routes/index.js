@@ -88,7 +88,7 @@ router.get('/user/get', function(req, res, next) {
 
 <!---- Delete data from mongodb through url  ----->
 router.get('/user/delete', function(req, res, next) {
-    req.users.findOne({ "_id": req.token }, function(err, data) {
+    req.users.findOne({ "_id": req.user_id }, function(err, data) {
         if (err) {
             req.err = "Invalid token";
             next(req.err)
@@ -141,6 +141,9 @@ router.get('/user/sort/:column/:type/:page', function(req, res, next) {
     });
 });
 
+
+<!------- Address API ------->
+
 router.post('/user/address', function(req, res, next) {
     var c_address = req.body.c_address;
     var p_address = req.body.p_address;
@@ -149,29 +152,22 @@ router.post('/user/address', function(req, res, next) {
     var state = req.body.state;
     var pin_code = req.body.pin_code;
     var phone_no = req.body.phone_no;
+    var user_id = req.user_id;
     if ((c_address.length > 0) && (p_address.length > 0) && (city.length > 0) && (state.length > 0) && (pin_code.length > 0) && (phone_no.length > 0)) {
-        req.users.findOne({
-            "_id": req.token,
-        }, function(err, docs) {
+        var record = new req.user_address({
+            "user_id": user_id,
+            "address": address,
+            "city": city,
+            "state": state,
+            "pin_code": pin_code,
+            "phone_no": phone_no,
+        });
+        record.save(function(err, docs) {
             if (err) {
-                throw err;
+                res.json("Records are already exists")
             } else {
-                var record = new req.user_address({
-                    "user_id": docs.id,
-                    "address": address,
-                    "city": city,
-                    "state": state,
-                    "pin_code": pin_code,
-                    "phone_no": phone_no,
-                });
-                record.save(function(err, docs) {
-                    if (err) {
-                        res.json("Record is not inserted")
-                    } else {
-                        res.json({ status: 1, messgae: "address inserted sucessfully" })
-                        next();
-                    }
-                });
+                res.json({ status: 1, messgae: "address inserted sucessfully" })
+                next();
             }
         });
     } else {
