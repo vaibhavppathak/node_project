@@ -164,14 +164,16 @@ router.post('/user/address', function(req, res, next) {
         });
         record.save(function(err, docs) {
             if (err) {
-                res.json("Records are already exists")
+                req.err = "Records are already exists";
+                next(req.err)
             } else {
                 res.json({ status: 1, messgae: "address inserted sucessfully" })
                 next();
             }
         });
     } else {
-        res.json("All field must be filled out");
+        req.err = "All field must be filled out";
+        next(req.err)
     }
 });
 
@@ -182,17 +184,14 @@ router.get('/user/search/:keyword', function(req, res, next) {
         if (err) {
             req.err = "Data not fetched";
             next(req.err)
-        } else if (users[0] == null) {
-            req.err = "data not found"
-            next(req.err)
         } else {
-            // console.log(users);
             var detail = [];
             async.eachSeries(users, function(error, result) {
                 req.user_address.find({ userid: users._id }).exec(function(error, data) {
                     if (error) {
                         req.err = "some error"
                         next(req.err)
+
                     } else if (!data) {
                         req.err = "data not fount"
                         next(req.err)
