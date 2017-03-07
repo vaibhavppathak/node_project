@@ -186,14 +186,17 @@ router.get('/user/search/:keyword', function(req, res, next) {
         if (err) {
             req.err = "Data not fetched";
             next(req.err)
+        } else if (users[0] == null) {
+            req.err = "data not found"
+            next(req.err)
         } else {
+            // console.log(users);
             var detail = [];
             async.eachSeries(users, function(error, result) {
                 req.user_address.find({ userid: users._id }).exec(function(error, data) {
                     if (error) {
                         req.err = "some error"
                         next(req.err)
-
                     } else if (!data) {
                         req.err = "data not fount"
                         next(req.err)
