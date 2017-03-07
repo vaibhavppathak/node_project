@@ -64,7 +64,7 @@ router.post('/user/login', function(req, res, next) {
             next();
         } else if (docs) {
             var token = jwt.sign({ token: docs._id }, "xxx", { expiresIn: 60 * 60 });
-            res.json({ status: 1, token: token, user: docs, messgae: "login sucessfully" })
+            res.json({ status: 1, token: token, messgae: "login sucessfully" })
             next();
         } else {
             req.err = "invalid password or username";
